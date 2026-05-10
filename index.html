@@ -1,0 +1,1652 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RetireReady — Retirement Readiness Calculator</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap');
+
+:root {
+–bg: #0d1117;
+–surface: #161b22;
+–surface2: #1e2530;
+–surface3: #252d3a;
+–border: #2a3441;
+–accent: #e8c547;
+–accent2: #f0a500;
+–green: #3ddc97;
+–red: #ff6b6b;
+–blue: #58a6ff;
+–purple: #bc8cff;
+–text: #e6edf3;
+–text2: #8b949e;
+–text3: #6e7681;
+–radius: 12px;
+–radius-sm: 8px;
+}
+
+- { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+background: var(–bg);
+color: var(–text);
+font-family: ‘DM Sans’, sans-serif;
+font-size: 14px;
+line-height: 1.6;
+min-height: 100vh;
+}
+
+/* HEADER */
+header {
+background: #0d1117;
+border-bottom: 1px solid #2a3441;
+padding: 10px 16px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+position: sticky;
+top: 0;
+z-index: 100;
+flex-wrap: nowrap;
+gap: 8px;
+min-height: 58px;
+}
+.logo {
+display: flex;
+align-items: center;
+gap: 8px;
+flex-shrink: 1;
+min-width: 0;
+overflow: hidden;
+}
+.logo h1 {
+font-family: ‘DM Serif Display’, serif;
+font-size: 20px;
+color: #e8c547;
+letter-spacing: -0.3px;
+white-space: nowrap;
+flex-shrink: 0;
+}
+.logo span {
+font-size: 10px;
+color: #8b949e;
+font-weight: 400;
+letter-spacing: 1px;
+text-transform: uppercase;
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+}
+.readiness-badge {
+display: flex;
+align-items: center;
+gap: 8px;
+background: #1e2530;
+border: 1px solid #2a3441;
+border-radius: 40px;
+padding: 6px 14px;
+flex-shrink: 0;
+}
+.readiness-badge .badge-text { display: flex; flex-direction: column; line-height: 1.3; }
+.readiness-badge .label { color: #8b949e; font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; }
+.readiness-badge .score-label { font-size: 10px; color: #e8c547; font-weight: 600; }
+.readiness-badge .score {
+font-family: ‘DM Serif Display’, serif;
+font-size: 26px;
+font-weight: 700;
+color: #e6edf3;
+transition: color 0.4s;
+line-height: 1;
+}
+
+/* LAYOUT */
+.main-grid {
+display: grid;
+grid-template-columns: 360px 1fr;
+gap: 0;
+min-height: calc(100vh - 58px);
+}
+
+/* SIDEBAR */
+.sidebar {
+background: var(–surface);
+border-right: 1px solid var(–border);
+overflow-y: auto;
+max-height: calc(100vh - 58px);
+position: sticky;
+top: 58px;
+}
+
+.sidebar-nav {
+display: flex;
+border-bottom: 1px solid var(–border);
+overflow-x: auto;
+-webkit-overflow-scrolling: touch;
+scrollbar-width: none;
+}
+.sidebar-nav::-webkit-scrollbar { display: none; }
+.nav-tab {
+flex: 1;
+min-width: 70px;
+padding: 12px 6px;
+text-align: center;
+font-size: 11px;
+font-weight: 600;
+letter-spacing: 0.5px;
+text-transform: uppercase;
+color: var(–text3);
+cursor: pointer;
+border-bottom: 2px solid transparent;
+transition: all 0.2s;
+white-space: nowrap;
+-webkit-tap-highlight-color: transparent;
+}
+.nav-tab.active { color: var(–accent); border-bottom-color: var(–accent); background: rgba(232,197,71,0.04); }
+.nav-tab:hover:not(.active) { color: var(–text2); background: var(–surface2); }
+
+.tab-panel { display: none; padding: 20px; }
+.tab-panel.active { display: block; }
+
+.section-title {
+font-family: ‘DM Serif Display’, serif;
+font-size: 15px;
+color: var(–accent);
+margin-bottom: 16px;
+padding-bottom: 8px;
+border-bottom: 1px solid var(–border);
+display: flex;
+align-items: center;
+gap: 8px;
+}
+.section-title .icon { font-size: 16px; }
+
+.field-group { margin-bottom: 16px; }
+.field-group label {
+display: block;
+font-size: 11px;
+font-weight: 600;
+text-transform: uppercase;
+letter-spacing: 0.8px;
+color: var(–text2);
+margin-bottom: 6px;
+}
+.field-group .hint {
+font-size: 10px;
+color: var(–text3);
+margin-top: 4px;
+font-weight: 300;
+}
+
+.input-wrap {
+position: relative;
+display: flex;
+align-items: center;
+}
+.input-prefix, .input-suffix {
+position: absolute;
+color: var(–text3);
+font-size: 13px;
+font-weight: 500;
+pointer-events: none;
+}
+.input-prefix { left: 12px; }
+.input-suffix { right: 12px; }
+
+input[type=“number”], input[type=“text”], select {
+width: 100%;
+background: #252d3a !important;
+-webkit-background-clip: initial !important;
+background-clip: initial !important;
+border: 1px solid #2a3441;
+border-radius: 8px;
+color: #e6edf3 !important;
+-webkit-text-fill-color: #e6edf3 !important;
+padding: 10px 12px;
+font-family: ‘DM Sans’, sans-serif;
+font-size: 15px;
+outline: none;
+transition: border-color 0.2s, box-shadow 0.2s;
+-moz-appearance: textfield;
+-webkit-appearance: none;
+appearance: none;
+box-shadow: none !important;
+}
+/* Override iOS autofill yellow */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+-webkit-box-shadow: 0 0 0 1000px #252d3a inset !important;
+-webkit-text-fill-color: #e6edf3 !important;
+caret-color: #e6edf3;
+}
+input[type=“number”]::-webkit-outer-spin-button,
+input[type=“number”]::-webkit-inner-spin-button { -webkit-appearance: none; }
+input.has-prefix { padding-left: 34px; }
+input.has-suffix { padding-right: 38px; }
+input:focus, select:focus {
+border-color: #e8c547 !important;
+box-shadow: 0 0 0 3px rgba(232,197,71,0.15) !important;
+background: #1e2530 !important;
+}
+select {
+appearance: none;
+-webkit-appearance: none;
+cursor: pointer;
+background: #252d3a !important;
+color: #e6edf3 !important;
+-webkit-text-fill-color: #e6edf3 !important;
+background-image: url(“data:image/svg+xml,%3Csvg xmlns=‘http://www.w3.org/2000/svg’ width=‘12’ height=‘12’ viewBox=‘0 0 12 12’%3E%3Cpath fill=’%238b949e’ d=‘M6 8L1 3h10z’/%3E%3C/svg%3E”) !important;
+background-repeat: no-repeat !important;
+background-position: right 12px center !important;
+padding-right: 32px;
+}
+/* Fix iOS input zoom */
+@media (max-width: 800px) {
+input[type=“number”], input[type=“text”], select { font-size: 16px; }
+}
+
+.slider-wrap { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
+input[type=“range”] {
+flex: 1;
+-webkit-appearance: none;
+background: var(–surface3);
+height: 4px;
+border-radius: 2px;
+outline: none;
+border: none;
+padding: 0;
+cursor: pointer;
+}
+input[type=“range”]::-webkit-slider-thumb {
+-webkit-appearance: none;
+width: 16px;
+height: 16px;
+background: var(–accent);
+border-radius: 50%;
+cursor: pointer;
+box-shadow: 0 0 0 3px rgba(232,197,71,0.2);
+}
+input[type=“range”]:focus::-webkit-slider-thumb { box-shadow: 0 0 0 4px rgba(232,197,71,0.35); }
+.slider-val {
+min-width: 46px;
+text-align: right;
+font-weight: 600;
+color: var(–accent);
+font-size: 13px;
+}
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.divider { border: none; border-top: 1px solid var(–border); margin: 18px 0; }
+
+/* MAIN CONTENT */
+.content {
+padding: 24px 28px;
+overflow-y: auto;
+background: var(–bg);
+min-width: 0; /* prevent grid blowout */
+}
+
+/* SUMMARY CARDS */
+.summary-grid {
+display: grid;
+grid-template-columns: repeat(3, 1fr);
+gap: 14px;
+margin-bottom: 24px;
+}
+.summary-card {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: var(–radius);
+padding: 20px 22px;
+position: relative;
+overflow: hidden;
+transition: border-color 0.2s;
+}
+.summary-card::before {
+content: ‘’;
+position: absolute;
+top: 0; left: 0; right: 0;
+height: 3px;
+}
+.summary-card.gold::before { background: linear-gradient(90deg, var(–accent), var(–accent2)); }
+.summary-card.green::before { background: linear-gradient(90deg, var(–green), #28a06a); }
+.summary-card.blue::before { background: linear-gradient(90deg, var(–blue), #1f6feb); }
+.summary-card.purple::before { background: linear-gradient(90deg, var(–purple), #8957e5); }
+.summary-card.red::before { background: linear-gradient(90deg, var(–red), #c0392b); }
+.summary-card.teal::before { background: linear-gradient(90deg, #26d0ce, #1a9188); }
+
+.card-icon { font-size: 22px; margin-bottom: 8px; }
+.card-label { font-size: 11px; color: var(–text3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+.card-value {
+font-family: ‘DM Serif Display’, serif;
+font-size: 22px;
+color: var(–text);
+letter-spacing: -0.5px;
+}
+.card-sub { font-size: 11px; color: var(–text3); margin-top: 4px; }
+
+/* INDEX METER */
+.index-section {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: var(–radius);
+padding: 28px 32px;
+margin-bottom: 28px;
+}
+.index-header {
+display: flex;
+justify-content: space-between;
+align-items: flex-start;
+margin-bottom: 24px;
+}
+.index-title {
+font-family: ‘DM Serif Display’, serif;
+font-size: 20px;
+margin-bottom: 4px;
+}
+.index-subtitle { color: var(–text3); font-size: 13px; }
+.index-score-big {
+text-align: right;
+}
+.index-score-big .num {
+font-family: ‘DM Serif Display’, serif;
+font-size: 52px;
+line-height: 1;
+transition: color 0.4s;
+}
+.index-score-big .denom { font-size: 20px; color: var(–text3); }
+.index-score-big .grade {
+font-size: 12px;
+text-transform: uppercase;
+letter-spacing: 2px;
+font-weight: 600;
+margin-top: 4px;
+}
+
+.meter-track {
+height: 16px;
+background: var(–surface3);
+border-radius: 8px;
+overflow: hidden;
+margin-bottom: 8px;
+position: relative;
+}
+.meter-fill {
+height: 100%;
+border-radius: 8px;
+transition: width 0.6s cubic-bezier(0.4,0,0.2,1), background 0.4s;
+position: relative;
+}
+.meter-fill::after {
+content: ‘’;
+position: absolute;
+top: 0; left: 0; right: 0; bottom: 0;
+background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 50%, transparent 100%);
+animation: shimmer 2s infinite;
+}
+@keyframes shimmer { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
+
+.meter-labels {
+display: flex;
+justify-content: space-between;
+font-size: 10px;
+color: var(–text3);
+margin-bottom: 20px;
+}
+
+.sub-meters {
+display: grid;
+grid-template-columns: repeat(5, 1fr);
+gap: 10px;
+}
+.sub-meter { text-align: center; }
+.sub-meter-label { font-size: 9px; color: var(–text3); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.3; }
+.sub-meter-bar {
+height: 6px;
+background: var(–surface3);
+border-radius: 3px;
+overflow: hidden;
+margin-bottom: 4px;
+}
+.sub-meter-fill {
+height: 100%;
+border-radius: 3px;
+transition: width 0.5s ease;
+}
+.sub-meter-val { font-size: 13px; font-weight: 700; }
+
+/* CHARTS */
+.charts-grid {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 14px;
+margin-bottom: 24px;
+}
+.chart-card {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: var(–radius);
+padding: 20px;
+}
+.chart-title {
+font-family: ‘DM Serif Display’, serif;
+font-size: 15px;
+margin-bottom: 4px;
+}
+.chart-sub { font-size: 11px; color: var(–text3); margin-bottom: 16px; }
+canvas { width: 100% !important; }
+
+/* PROJECTION TABLE */
+.projection-card {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: var(–radius);
+padding: 20px;
+margin-bottom: 28px;
+}
+.table-wrap { overflow-x: auto; }
+table {
+width: 100%;
+border-collapse: collapse;
+font-size: 12px;
+}
+th {
+background: var(–surface2);
+color: var(–text3);
+font-size: 10px;
+text-transform: uppercase;
+letter-spacing: 0.8px;
+padding: 10px 12px;
+text-align: right;
+border-bottom: 1px solid var(–border);
+white-space: nowrap;
+}
+th:first-child { text-align: left; }
+td {
+padding: 8px 12px;
+text-align: right;
+border-bottom: 1px solid rgba(42,52,65,0.5);
+color: var(–text2);
+}
+td:first-child { text-align: left; color: var(–text); font-weight: 500; }
+tr:hover td { background: var(–surface2); }
+tr.highlight td { color: var(–accent); font-weight: 600; }
+tr.milestone td { background: rgba(232,197,71,0.05); }
+
+/* INCOME BREAKDOWN */
+.income-section {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: var(–radius);
+padding: 20px;
+margin-bottom: 28px;
+}
+.income-row {
+display: flex;
+align-items: center;
+justify-content: space-between;
+padding: 12px 0;
+border-bottom: 1px solid var(–border);
+}
+.income-row:last-child { border-bottom: none; }
+.income-left { display: flex; align-items: center; gap: 12px; }
+.income-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.income-name { font-weight: 500; font-size: 13px; }
+.income-desc { font-size: 11px; color: var(–text3); }
+.income-right { text-align: right; }
+.income-amount { font-family: ‘DM Serif Display’, serif; font-size: 16px; }
+.income-pct { font-size: 11px; color: var(–text3); }
+
+/* ALERTS */
+.alerts {
+display: flex;
+flex-direction: column;
+gap: 10px;
+margin-bottom: 28px;
+}
+.alert {
+display: flex;
+align-items: flex-start;
+gap: 12px;
+padding: 14px 16px;
+border-radius: var(–radius-sm);
+border: 1px solid;
+font-size: 13px;
+}
+.alert.warn { background: rgba(240,165,0,0.08); border-color: rgba(240,165,0,0.3); }
+.alert.good { background: rgba(61,220,151,0.06); border-color: rgba(61,220,151,0.25); }
+.alert.bad { background: rgba(255,107,107,0.07); border-color: rgba(255,107,107,0.25); }
+.alert-icon { font-size: 16px; flex-shrink: 0; }
+.alert-text strong { display: block; margin-bottom: 2px; font-weight: 600; }
+.alert-text span { color: var(–text2); }
+
+/* RESPONSIVE */
+@media (max-width: 1100px) {
+.main-grid { grid-template-columns: 300px 1fr; }
+.summary-grid { grid-template-columns: repeat(2, 1fr); }
+.charts-grid { grid-template-columns: 1fr; }
+.sub-meters { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 800px) {
+.main-grid { grid-template-columns: 1fr; }
+.sidebar {
+position: static;
+max-height: none;
+border-right: none;
+border-bottom: 3px solid var(–accent);
+top: 0;
+}
+.tab-panel { padding: 14px; }
+.content { padding: 14px; }
+.sub-meters { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.summary-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+.summary-card { padding: 12px 14px; }
+.card-value { font-size: 16px; }
+.card-label { font-size: 10px; }
+.index-section { padding: 16px 14px; }
+.index-header { flex-direction: column; gap: 10px; align-items: flex-start; }
+.index-score-big { text-align: left; }
+.index-score-big .num { font-size: 38px; }
+.charts-grid { grid-template-columns: 1fr; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.income-section { padding: 14px; }
+}
+@media (max-width: 420px) {
+.summary-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+.sub-meters { grid-template-columns: 1fr 1fr; gap: 8px; }
+.nav-tab { font-size: 10px; padding: 10px 2px; min-width: 60px; }
+.card-value { font-size: 14px; }
+}
+
+/* TOOLTIP */
+.tooltip { position: relative; cursor: help; }
+.tooltip::after {
+content: attr(data-tip);
+position: absolute;
+bottom: calc(100% + 6px);
+left: 50%;
+transform: translateX(-50%);
+background: #1e2530;
+border: 1px solid var(–border);
+color: var(–text2);
+font-size: 11px;
+padding: 6px 10px;
+border-radius: 6px;
+white-space: nowrap;
+pointer-events: none;
+opacity: 0;
+transition: opacity 0.2s;
+z-index: 50;
+}
+.tooltip:hover::after { opacity: 1; }
+
+/* Toggle switch */
+.toggle-row {
+display: flex;
+align-items: center;
+justify-content: space-between;
+margin-bottom: 14px;
+}
+.toggle-label { font-size: 12px; color: var(–text2); font-weight: 500; }
+.toggle {
+position: relative;
+width: 36px;
+height: 20px;
+cursor: pointer;
+}
+.toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+.toggle-track {
+position: absolute;
+top: 0; left: 0; right: 0; bottom: 0;
+background: var(–surface3);
+border-radius: 10px;
+transition: background 0.2s;
+}
+.toggle input:checked + .toggle-track { background: var(–accent); }
+.toggle-thumb {
+position: absolute;
+top: 3px; left: 3px;
+width: 14px; height: 14px;
+background: white;
+border-radius: 50%;
+transition: transform 0.2s;
+}
+.toggle input:checked ~ .toggle-thumb { transform: translateX(16px); }
+
+.currency-tag {
+display: inline-block;
+background: var(–surface3);
+border: 1px solid var(–border);
+border-radius: 4px;
+padding: 2px 8px;
+font-size: 11px;
+color: var(–text3);
+margin-left: 8px;
+vertical-align: middle;
+}
+
+.info-icon {
+display: inline-block;
+width: 14px;
+height: 14px;
+background: var(–surface3);
+border-radius: 50%;
+text-align: center;
+line-height: 14px;
+font-size: 9px;
+color: var(–text3);
+cursor: help;
+vertical-align: middle;
+margin-left: 4px;
+}
+
+.footer-note {
+text-align: center;
+color: var(–text3);
+font-size: 11px;
+padding: 20px;
+border-top: 1px solid var(–border);
+}
+</style>
+
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <h1>RetireReady</h1>
+    <span>SG Retirement Planner</span>
+  </div>
+  <div class="readiness-badge">
+    <div class="badge-text">
+      <div class="label">Readiness Index</div>
+      <div class="score-label" id="grade-label">—</div>
+    </div>
+    <div class="score" id="header-score">—</div>
+  </div>
+</header>
+
+<div class="main-grid">
+
+  <!-- SIDEBAR -->
+
+  <aside class="sidebar">
+    <div class="sidebar-nav">
+      <div class="nav-tab active" onclick="switchTab('profile',this)">Profile</div>
+      <div class="nav-tab" onclick="switchTab('assets',this)">Assets</div>
+      <div class="nav-tab" onclick="switchTab('income',this)">Income</div>
+      <div class="nav-tab" onclick="switchTab('rates',this)">Rates</div>
+    </div>
+
+```
+<!-- PROFILE TAB -->
+<div class="tab-panel active" id="tab-profile">
+  <div class="section-title"><span class="icon">👤</span> Personal Profile</div>
+  <div class="two-col">
+    <div class="field-group">
+      <label>Current Age</label>
+      <div class="input-wrap">
+        <input type="number" id="currentAge" value="35" min="18" max="80" oninput="calc()">
+        <span class="input-suffix">yrs</span>
+      </div>
+    </div>
+    <div class="field-group">
+      <label>Planned Retire Age</label>
+      <div class="input-wrap">
+        <input type="number" id="retireAge" value="62" min="40" max="80" oninput="calc()">
+        <span class="input-suffix">yrs</span>
+      </div>
+    </div>
+  </div>
+  <div class="field-group">
+    <label>CPF Payout Age (Cohort) <span class="info-icon tooltip" data-tip="CPF Life starts at 65 (current scheme). Adjust if policy changes.">?</span></label>
+    <div class="slider-wrap">
+      <input type="range" id="cpfAge" min="60" max="70" value="65" oninput="syncSlider(this,'cpfAgeVal','');calc()">
+      <span class="slider-val" id="cpfAgeVal">65</span>
+    </div>
+    <div class="hint">CPF LIFE payout commencement age</div>
+  </div>
+  <div class="field-group">
+    <label>Life Expectancy</label>
+    <div class="slider-wrap">
+      <input type="range" id="lifeExp" min="70" max="100" value="88" oninput="syncSlider(this,'lifeExpVal','');calc()">
+      <span class="slider-val" id="lifeExpVal">88</span>
+    </div>
+    <div class="hint">Singapore avg female 87, male 84</div>
+  </div>
+  <hr class="divider">
+  <div class="section-title"><span class="icon">💸</span> Monthly Expenses in Retirement</div>
+  <div class="field-group">
+    <label>Basic Living Expenses</label>
+    <div class="input-wrap">
+      <span class="input-prefix">S$</span>
+      <input type="number" class="has-prefix" id="expBasic" value="2500" oninput="calc()">
+    </div>
+    <div class="hint">Food, transport, utilities, household</div>
+  </div>
+  <div class="field-group">
+    <label>Healthcare / Insurance</label>
+    <div class="input-wrap">
+      <span class="input-prefix">S$</span>
+      <input type="number" class="has-prefix" id="expHealth" value="600" oninput="calc()">
+    </div>
+  </div>
+  <div class="field-group">
+    <label>Leisure / Travel</label>
+    <div class="input-wrap">
+      <span class="input-prefix">S$</span>
+      <input type="number" class="has-prefix" id="expLeisure" value="800" oninput="calc()">
+    </div>
+  </div>
+  <div class="field-group">
+    <label>Family / Dependants</label>
+    <div class="input-wrap">
+      <span class="input-prefix">S$</span>
+      <input type="number" class="has-prefix" id="expFamily" value="300" oninput="calc()">
+    </div>
+  </div>
+  <div class="field-group">
+    <label>Emergency Buffer (monthly)</label>
+    <div class="input-wrap">
+      <span class="input-prefix">S$</span>
+      <input type="number" class="has-prefix" id="expEmerg" value="200" oninput="calc()">
+    </div>
+  </div>
+</div>
+
+<!-- ASSETS TAB -->
+<div class="tab-panel" id="tab-assets">
+  <div class="section-title"><span class="icon">🏦</span> CPF Balances</div>
+  <div class="field-group">
+    <label>CPF Ordinary Account (OA)</label>
+    <div class="input-wrap">
+      <span class="input-prefix">S$</span>
+      <input type="number" class="has-prefix" id="cpfOA" value="80000" oninput="calc()">
+    </div>
+  </div>
+  <div class="field-group">
+    <label>CPF Special Account (SA)</label>
+    <div class="input-wrap">
+      <span class="input-prefix">S$</span>
+      <input type="number" class="has-prefix" id="cpfSA" value="45000" oninput="calc()">
+    </div>
+    <div class="hint">Earns 4% p.a. (floored)</div>
+  </div>
+  <div class="field-group">
+    <label>CPF MediSave Account</label>
+    <div class="input-wrap">
+      <span class="input-prefix">S$</span>
+      <input type="number" class="has-prefix" id="cpfMA" value="30000" oninput="calc()">
+    </div>
+  </div>
+  <hr class="divider">
+  <div class="section-title"><span class="icon">🏠</span> Property</div>
+  <div class="toggle-row">
+    <span class="toggle-label">Include property in net worth</span>
+    <label class="toggle">
+      <input type="checkbox" id="inclProp" checked onchange="calc()">
+      <div class="toggle-track"></div>
+      <div class="toggle-thumb"></div>
+    </label>
+  </div>
+  <div class="field-group">
+    <label>Primary Residence Value</label>
+    <div class="input-wrap">
+      <span class="input-prefix">S$</span>
+      <input type="number" class="has-prefix" id="propPrimary" value="650000" oninput="calc()">
+    </div>
+  </div>
+  <div class="field-group">
+    <label>Investment / Other Property</label>
+    <div class="input-wrap">
+      <span class="input-prefix">S$</span>
+      <input type="number" class="has-prefix" id="propInvest" value="0" oninput="calc()">
+    </div>
+  </div>
+  <div class="field-group">
+    <label>Outstanding Mortgage(s)</label>
+    <div class="input-wrap">
+      <span class="input-prefix">S$</span>
+      <input type="number" class="has-prefix" id="mortgage" value="150000" oninput="calc()">
+    </div>
+  </div>
+  <hr class="divider">
+  <div class="section-title"><span class="icon">📈</span> Investments & Cash</div>
+  <div class="field-group">
+    <label>Stocks / Unit Trusts / ETFs</label>
+    <div class="input-wrap">
+      <span class="input-prefix">S$</span>
+      <input type="number" class="has-prefix" id="stocks" value="120000" oninput="calc()">
+    </div>
+  </div>
+  <div class="field-group">
+    <label>Bonds / Fixed Deposits</label>
+    <div class="input-wrap">
+      <span class="input-prefix">S$</span>
+      <input type="number" class="has-prefix" id="bonds" value="40000" oninput="calc()">
+    </div>
+  </div>
+  <div class="field-group">
+    <label>REITs</label>
+    <div class="input-wrap">
+      <span class="input-prefix">S$</span>
+      <input type="number" class="has-prefix" id="reits" value="30000" oninput="calc()">
+    </div>
+  </div>
+  <div class="field-group">
+    <label>Cash / Savings / SSB</label>
+    <div class="input-wrap">
+      <span class="input-prefix">S$</span>
+      <input type="number" class="has-prefix" id="cash" value="60000" oninput="calc()">
+    </div>
+  </div>
+  <div class="field-group">
+    <label>Endowment / Insurance Value</label>
+    <div class="input-wrap">
+      <span class="input-prefix">S$</span>
+      <input type="number" class="has-prefix" id="endowment" value="25000" oninput="calc()">
+    </div>
+  </div>
+  <div class="field-group">
+    <label>Other Assets (crypto, collectibles)</label>
+    <div class="input-wrap">
+      <span class="input-prefix">S$</span>
+      <input type="number" class="has-prefix" id="otherAssets" value="0" oninput="calc()">
+    </div>
+  </div>
+  <hr class="divider">
+  <div class="section-title"><span class="icon">💳</span> Liabilities</div>
+  <div class="field-group">
+    <label>Other Debts (car, personal, credit)</label>
+    <div class="input-wrap">
+      <span class="input-prefix">S$</span>
+      <input type="number" class="has-prefix" id="otherDebts" value="15000" oninput="calc()">
+    </div>
+  </div>
+</div>
+
+<!-- INCOME TAB -->
+<div class="tab-panel" id="tab-income">
+  <div class="section-title"><span class="icon">💼</span> Active Income</div>
+  <div class="field-group">
+    <label>Monthly Take-Home Salary</label>
+    <div class="input-wrap">
+      <span class="input-prefix">S$</span>
+      <input type="number" class="has-prefix" id="salary" value="7000" oninput="calc()">
+    </div>
+  </div>
+  <div class="field-group">
+    <label>Side Business / Freelance Income</label>
+    <div class="input-wrap">
+      <span class="input-prefix">S$</span>
+      <input type="number" class="has-prefix" id="sideIncome" value="500" oninput="calc()">
+    </div>
+    <div class="hint">Monthly average</div>
+  </div>
+  <div class="field-group">
+    <label>Bonus (Annual, avg)</label>
+    <div class="input-wrap">
+      <span class="input-prefix">S$</span>
+      <input type="number" class="has-prefix" id="bonus" value="14000" oninput="calc()">
+    </div>
+  </div>
+  <div class="field-group">
+    <label>Monthly Savings Rate</label>
+    <div class="slider-wrap">
+      <input type="range" id="savingsRate" min="0" max="80" value="30" oninput="syncSlider(this,'savingsRateVal','%');calc()">
+      <span class="slider-val" id="savingsRateVal">30%</span>
+    </div>
+    <div class="hint">% of take-home + side income saved</div>
+  </div>
+  <hr class="divider">
+  <div class="section-title"><span class="icon">🏘️</span> Passive & Investment Income</div>
+  <div class="field-group">
+    <label>Rental Income (monthly, net)</label>
+    <div class="input-wrap">
+      <span class="input-prefix">S$</span>
+      <input type="number" class="has-prefix" id="rentalIncome" value="0" oninput="calc()">
+    </div>
+    <div class="hint">After maintenance, agent fees, taxes</div>
+  </div>
+  <div class="field-group">
+    <label>Dividend Income (monthly avg)</label>
+    <div class="input-wrap">
+      <span class="input-prefix">S$</span>
+      <input type="number" class="has-prefix" id="dividendIncome" value="300" oninput="calc()">
+    </div>
+    <div class="hint">From stocks, REITs, ETFs</div>
+  </div>
+  <div class="field-group">
+    <label>Interest Income (monthly avg)</label>
+    <div class="input-wrap">
+      <span class="input-prefix">S$</span>
+      <input type="number" class="has-prefix" id="interestIncome" value="150" oninput="calc()">
+    </div>
+    <div class="hint">FD, SSB, T-Bills, savings accounts</div>
+  </div>
+  <div class="field-group">
+    <label>Other Passive Income</label>
+    <div class="input-wrap">
+      <span class="input-prefix">S$</span>
+      <input type="number" class="has-prefix" id="otherPassive" value="0" oninput="calc()">
+    </div>
+    <div class="hint">Royalties, digital products, etc.</div>
+  </div>
+  <hr class="divider">
+  <div class="section-title"><span class="icon">🏛️</span> Retirement Income Sources</div>
+  <div class="field-group">
+    <label>Expected CPF LIFE Monthly Payout</label>
+    <div class="input-wrap">
+      <span class="input-prefix">S$</span>
+      <input type="number" class="has-prefix" id="cpfLife" value="1500" oninput="calc()">
+    </div>
+    <div class="hint">Based on Retirement Account at 65</div>
+  </div>
+  <div class="field-group">
+    <label>Expected Rental Income in Retirement</label>
+    <div class="input-wrap">
+      <span class="input-prefix">S$</span>
+      <input type="number" class="has-prefix" id="retirRental" value="0" oninput="calc()">
+    </div>
+  </div>
+  <div class="field-group">
+    <label>Expected Dividend/Portfolio Income</label>
+    <div class="input-wrap">
+      <span class="input-prefix">S$</span>
+      <input type="number" class="has-prefix" id="retirDividend" value="800" oninput="calc()">
+    </div>
+  </div>
+  <div class="field-group">
+    <label>Part-time / Consultancy Income</label>
+    <div class="input-wrap">
+      <span class="input-prefix">S$</span>
+      <input type="number" class="has-prefix" id="retirActive" value="500" oninput="calc()">
+    </div>
+    <div class="hint">Expected for first few years of retirement</div>
+  </div>
+  <div class="field-group">
+    <label>Other Expected Sources</label>
+    <div class="input-wrap">
+      <span class="input-prefix">S$</span>
+      <input type="number" class="has-prefix" id="retirOther" value="0" oninput="calc()">
+    </div>
+  </div>
+</div>
+
+<!-- RATES TAB -->
+<div class="tab-panel" id="tab-rates">
+  <div class="section-title"><span class="icon">📊</span> Economic Assumptions</div>
+  <div class="field-group">
+    <label>Inflation Rate (p.a.)</label>
+    <div class="slider-wrap">
+      <input type="range" id="inflation" min="0" max="8" step="0.1" value="2.5" oninput="syncSlider(this,'inflationVal','%');calc()">
+      <span class="slider-val" id="inflationVal">2.5%</span>
+    </div>
+    <div class="hint">Singapore avg ~2–3% historically</div>
+  </div>
+  <div class="field-group">
+    <label>Healthcare Inflation (p.a.)</label>
+    <div class="slider-wrap">
+      <input type="range" id="healthInflation" min="0" max="10" step="0.1" value="4.0" oninput="syncSlider(this,'healthInflationVal','%');calc()">
+      <span class="slider-val" id="healthInflationVal">4.0%</span>
+    </div>
+    <div class="hint">Medical costs typically rise faster</div>
+  </div>
+  <hr class="divider">
+  <div class="section-title"><span class="icon">💹</span> Investment Return Assumptions</div>
+  <div class="field-group">
+    <label>Portfolio Return (p.a., pre-retire)</label>
+    <div class="slider-wrap">
+      <input type="range" id="investReturn" min="0" max="15" step="0.1" value="6.0" oninput="syncSlider(this,'investReturnVal','%');calc()">
+      <span class="slider-val" id="investReturnVal">6.0%</span>
+    </div>
+    <div class="hint">Blended return on invested assets</div>
+  </div>
+  <div class="field-group">
+    <label>Portfolio Return (p.a., in-retirement)</label>
+    <div class="slider-wrap">
+      <input type="range" id="retirReturn" min="0" max="12" step="0.1" value="4.0" oninput="syncSlider(this,'retirReturnVal','%');calc()">
+      <span class="slider-val" id="retirReturnVal">4.0%</span>
+    </div>
+    <div class="hint">Conservative drawdown portfolio</div>
+  </div>
+  <div class="field-group">
+    <label>Property Appreciation (p.a.)</label>
+    <div class="slider-wrap">
+      <input type="range" id="propGrowth" min="0" max="8" step="0.1" value="2.0" oninput="syncSlider(this,'propGrowthVal','%');calc()">
+      <span class="slider-val" id="propGrowthVal">2.0%</span>
+    </div>
+  </div>
+  <div class="field-group">
+    <label>Salary Growth (p.a.)</label>
+    <div class="slider-wrap">
+      <input type="range" id="salaryGrowth" min="0" max="10" step="0.1" value="3.0" oninput="syncSlider(this,'salaryGrowthVal','%');calc()">
+      <span class="slider-val" id="salaryGrowthVal">3.0%</span>
+    </div>
+  </div>
+  <div class="field-group">
+    <label>CPF OA Interest Rate (p.a.)</label>
+    <div class="slider-wrap">
+      <input type="range" id="cpfOARate" min="2" max="4" step="0.01" value="2.5" oninput="syncSlider(this,'cpfOARateVal','%');calc()">
+      <span class="slider-val" id="cpfOARateVal">2.5%</span>
+    </div>
+  </div>
+  <div class="field-group">
+    <label>CPF SA Interest Rate (p.a.)</label>
+    <div class="slider-wrap">
+      <input type="range" id="cpfSARate" min="4" max="6" step="0.01" value="4.0" oninput="syncSlider(this,'cpfSARateVal','%');calc()">
+      <span class="slider-val" id="cpfSARateVal">4.0%</span>
+    </div>
+    <div class="hint">SA earns min 4% p.a.</div>
+  </div>
+  <hr class="divider">
+  <div class="section-title"><span class="icon">⚙️</span> Advanced Settings</div>
+  <div class="toggle-row">
+    <span class="toggle-label">Apply Monte Carlo variance</span>
+    <label class="toggle">
+      <input type="checkbox" id="monteCarlo" onchange="calc()">
+      <div class="toggle-track"></div>
+      <div class="toggle-thumb"></div>
+    </label>
+  </div>
+  <div class="toggle-row">
+    <span class="toggle-label">Include estate planning buffer (10%)</span>
+    <label class="toggle">
+      <input type="checkbox" id="estateBuffer" onchange="calc()">
+      <div class="toggle-track"></div>
+      <div class="toggle-thumb"></div>
+    </label>
+  </div>
+  <div class="toggle-row">
+    <span class="toggle-label">Include Medishield/Careshield premiums</span>
+    <label class="toggle">
+      <input type="checkbox" id="medishield" checked onchange="calc()">
+      <div class="toggle-track"></div>
+      <div class="toggle-thumb"></div>
+    </label>
+  </div>
+  <div class="field-group">
+    <label>Withdrawal Strategy</label>
+    <select id="withdrawalStrategy" onchange="calc()">
+      <option value="4pct">4% Safe Withdrawal Rate</option>
+      <option value="bucket">Bucket Strategy (3-bucket)</option>
+      <option value="dynamic">Dynamic Withdrawal (income floor)</option>
+    </select>
+  </div>
+</div>
+```
+
+  </aside>
+
+  <!-- MAIN CONTENT -->
+
+  <main class="content">
+
+```
+<!-- ALERTS -->
+<div class="alerts" id="alerts-container"></div>
+
+<!-- SUMMARY CARDS -->
+<div class="summary-grid">
+  <div class="summary-card gold">
+    <div class="card-icon">🎯</div>
+    <div class="card-label">Target Retirement Sum</div>
+    <div class="card-value" id="c-targetSum">—</div>
+    <div class="card-sub" id="c-targetSub">Inflation-adjusted requirement</div>
+  </div>
+  <div class="summary-card green">
+    <div class="card-icon">💰</div>
+    <div class="card-label">Projected Net Worth at Retire</div>
+    <div class="card-value" id="c-projNW">—</div>
+    <div class="card-sub" id="c-projNWSub">All assets grown to retire date</div>
+  </div>
+  <div class="summary-card blue">
+    <div class="card-icon">📅</div>
+    <div class="card-label">Years to Retirement</div>
+    <div class="card-value" id="c-yearsToRetire">—</div>
+    <div class="card-sub">Accumulation phase</div>
+  </div>
+  <div class="summary-card purple">
+    <div class="card-icon">📊</div>
+    <div class="card-label">Retirement Duration</div>
+    <div class="card-value" id="c-retirDuration">—</div>
+    <div class="card-sub">Drawdown phase</div>
+  </div>
+  <div class="summary-card teal">
+    <div class="card-icon">🏦</div>
+    <div class="card-label">Current Net Worth</div>
+    <div class="card-value" id="c-netWorth">—</div>
+    <div class="card-sub">Today's snapshot</div>
+  </div>
+  <div class="summary-card red" id="c-gap-card">
+    <div class="card-icon">📉</div>
+    <div class="card-label">Surplus / Shortfall</div>
+    <div class="card-value" id="c-gap">—</div>
+    <div class="card-sub" id="c-gapSub">At planned retirement age</div>
+  </div>
+</div>
+
+<!-- READINESS INDEX -->
+<div class="index-section">
+  <div class="index-header">
+    <div>
+      <div class="index-title">Retirement Readiness Index</div>
+      <div class="index-subtitle">Composite score across 5 dimensions of retirement preparedness</div>
+    </div>
+    <div class="index-score-big">
+      <span class="num" id="bigScore">—</span><span class="denom">/100</span>
+      <div class="grade" id="bigGrade">—</div>
+    </div>
+  </div>
+  <div class="meter-track">
+    <div class="meter-fill" id="mainMeter" style="width:0%;background:var(--red)"></div>
+  </div>
+  <div class="meter-labels">
+    <span>Critical (0)</span><span>Poor (25)</span><span>Fair (50)</span><span>Good (70)</span><span>Excellent (100)</span>
+  </div>
+  <div class="sub-meters">
+    <div class="sub-meter">
+      <div class="sub-meter-label">Asset Coverage</div>
+      <div class="sub-meter-bar"><div class="sub-meter-fill" id="sub-asset" style="width:0%;background:var(--blue)"></div></div>
+      <div class="sub-meter-val" id="sub-asset-val" style="color:var(--blue)">0</div>
+    </div>
+    <div class="sub-meter">
+      <div class="sub-meter-label">Income Security</div>
+      <div class="sub-meter-bar"><div class="sub-meter-fill" id="sub-income" style="width:0%;background:var(--green)"></div></div>
+      <div class="sub-meter-val" id="sub-income-val" style="color:var(--green)">0</div>
+    </div>
+    <div class="sub-meter">
+      <div class="sub-meter-label">Savings Rate</div>
+      <div class="sub-meter-bar"><div class="sub-meter-fill" id="sub-savings" style="width:0%;background:var(--accent)"></div></div>
+      <div class="sub-meter-val" id="sub-savings-val" style="color:var(--accent)">0</div>
+    </div>
+    <div class="sub-meter">
+      <div class="sub-meter-label">Time Horizon</div>
+      <div class="sub-meter-bar"><div class="sub-meter-fill" id="sub-time" style="width:0%;background:var(--purple)"></div></div>
+      <div class="sub-meter-val" id="sub-time-val" style="color:var(--purple)">0</div>
+    </div>
+    <div class="sub-meter">
+      <div class="sub-meter-label">Diversification</div>
+      <div class="sub-meter-bar"><div class="sub-meter-fill" id="sub-div" style="width:0%;background:#26d0ce"></div></div>
+      <div class="sub-meter-val" id="sub-div-val" style="color:#26d0ce">0</div>
+    </div>
+  </div>
+</div>
+
+<!-- RETIREMENT INCOME BREAKDOWN -->
+<div class="income-section">
+  <div class="chart-title" style="font-family:'DM Serif Display',serif;font-size:17px;margin-bottom:4px;">Monthly Retirement Income Breakdown</div>
+  <div class="chart-sub">Expected monthly income at retirement age, in today's dollars</div>
+  <div id="income-rows"></div>
+  <div class="income-row" style="background:var(--surface2);border-radius:8px;padding:14px 12px;margin-top:8px;">
+    <div class="income-left">
+      <div style="font-weight:700;font-size:14px;">Total Monthly Income vs Required</div>
+    </div>
+    <div class="income-right">
+      <div class="income-amount" id="income-total-row">—</div>
+      <div class="income-pct" id="income-cover-pct">—</div>
+    </div>
+  </div>
+</div>
+
+<!-- CHARTS -->
+<div class="charts-grid">
+  <div class="chart-card">
+    <div class="chart-title">Wealth Accumulation Projection</div>
+    <div class="chart-sub">Net worth trajectory to retirement and beyond</div>
+    <canvas id="growthChart" height="220"></canvas>
+  </div>
+  <div class="chart-card">
+    <div class="chart-title">Asset Allocation Today</div>
+    <div class="chart-sub">Current portfolio composition</div>
+    <canvas id="assetChart" height="220"></canvas>
+  </div>
+  <div class="chart-card">
+    <div class="chart-title">Retirement Income Sources</div>
+    <div class="chart-sub">Monthly income mix at retirement</div>
+    <canvas id="incomeChart" height="220"></canvas>
+  </div>
+  <div class="chart-card">
+    <div class="chart-title">Drawdown Simulation</div>
+    <div class="chart-sub">Portfolio balance during retirement years</div>
+    <canvas id="drawdownChart" height="220"></canvas>
+  </div>
+</div>
+
+<!-- PROJECTION TABLE -->
+<div class="projection-card">
+  <div class="chart-title" style="font-family:'DM Serif Display',serif;font-size:17px;margin-bottom:4px;">Year-by-Year Financial Projection</div>
+  <div class="chart-sub" style="margin-bottom:16px;">Key milestones in your financial journey</div>
+  <div class="table-wrap">
+    <table id="projTable">
+      <thead>
+        <tr>
+          <th>Year / Age</th>
+          <th>Invested Assets</th>
+          <th>CPF Total</th>
+          <th>Net Worth</th>
+          <th>Annual Savings</th>
+          <th>Passive Income</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody id="projBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="footer-note">
+  RetireReady — For educational purposes only. Not financial advice. All figures in Singapore Dollars. 
+  Works fully offline — save this HTML file locally or host on GitHub Pages.
+</div>
+```
+
+  </main>
+</div>
+
+<script>
+// ─── HELPERS ─────────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+const fmtS = n => 'S$' + Math.abs(n).toLocaleString('en-SG', {maximumFractionDigits:0});
+const fmtPct = n => n.toFixed(1) + '%';
+const clamp = (v,mn,mx) => Math.min(mx, Math.max(mn, v));
+
+function syncSlider(el, valId, suffix) {
+  $(valId).textContent = parseFloat(el.value).toFixed(el.step && el.step < 1 ? 1 : 0) + suffix;
+}
+
+function switchTab(name, el) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  $('tab-' + name).classList.add('active');
+  el.classList.add('active');
+}
+
+function getColor(score) {
+  if (score >= 80) return 'var(--green)';
+  if (score >= 60) return 'var(--accent)';
+  if (score >= 40) return '#f0a500';
+  return 'var(--red)';
+}
+function getGrade(score) {
+  if (score >= 85) return 'EXCELLENT';
+  if (score >= 70) return 'GOOD';
+  if (score >= 55) return 'FAIR';
+  if (score >= 35) return 'POOR';
+  return 'CRITICAL';
+}
+
+// ─── CHART HELPERS ────────────────────────────────────────────────
+let charts = {};
+function destroyChart(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
+
+function drawLineChart(id, labels, datasets) {
+  destroyChart(id);
+  const ctx = $(id).getContext('2d');
+  charts[id] = new Chart(ctx, {
+    type: 'line',
+    data: { labels, datasets: datasets.map(d => ({
+      ...d,
+      pointRadius: 0,
+      pointHoverRadius: 4,
+      tension: 0.4,
+      fill: d.fill !== undefined ? d.fill : false,
+    }))},
+    options: {
+      responsive: true,
+      plugins: { legend: { labels: { color: '#8b949e', font: { size: 11 }, boxWidth: 12 } } },
+      scales: {
+        x: { ticks: { color: '#6e7681', font: { size: 10 }, maxTicksLimit: 10 }, grid: { color: '#2a3441' } },
+        y: { ticks: { color: '#6e7681', font: { size: 10 }, callback: v => 'S$' + (v >= 1e6 ? (v/1e6).toFixed(1)+'M' : v >= 1e3 ? (v/1e3).toFixed(0)+'K' : v) }, grid: { color: '#2a3441' } }
+      },
+      interaction: { mode: 'index', intersect: false }
+    }
+  });
+}
+
+function drawDoughnutChart(id, labels, data, colors) {
+  destroyChart(id);
+  const ctx = $(id).getContext('2d');
+  charts[id] = new Chart(ctx, {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data, backgroundColor: colors, borderColor: '#161b22', borderWidth: 3 }] },
+    options: {
+      responsive: true,
+      cutout: '65%',
+      plugins: {
+        legend: { position: 'bottom', labels: { color: '#8b949e', font: { size: 11 }, boxWidth: 12, padding: 12 } }
+      }
+    }
+  });
+}
+
+// ─── MAIN CALC ────────────────────────────────────────────────────
+function calc() {
+  // --- INPUTS ---
+  const curAge = parseInt($('currentAge').value) || 35;
+  const retAge = parseInt($('retireAge').value) || 62;
+  const cpfAge = parseInt($('cpfAge').value) || 65;
+  const lifeExp = parseInt($('lifeExp').value) || 88;
+  const yearsToRetire = Math.max(1, retAge - curAge);
+  const retireDuration = Math.max(1, lifeExp - retAge);
+
+  // Expenses
+  const expBasic = parseFloat($('expBasic').value) || 0;
+  const expHealth = parseFloat($('expHealth').value) || 0;
+  const expLeisure = parseFloat($('expLeisure').value) || 0;
+  const expFamily = parseFloat($('expFamily').value) || 0;
+  const expEmerg = parseFloat($('expEmerg').value) || 0;
+  const medishield = $('medishield').checked ? 200 : 0;
+  const totalMonthlyExp = expBasic + expHealth + expLeisure + expFamily + expEmerg + medishield;
+  const totalAnnualExp = totalMonthlyExp * 12;
+
+  // Rates
+  const inflation = parseFloat($('inflation').value) / 100 || 0.025;
+  const healthInflation = parseFloat($('healthInflation').value) / 100 || 0.04;
+  const investReturn = parseFloat($('investReturn').value) / 100 || 0.06;
+  const retirReturn = parseFloat($('retirReturn').value) / 100 || 0.04;
+  const propGrowth = parseFloat($('propGrowth').value) / 100 || 0.02;
+  const salaryGrowth = parseFloat($('salaryGrowth').value) / 100 || 0.03;
+  const cpfOARate = parseFloat($('cpfOARate').value) / 100 || 0.025;
+  const cpfSARate = parseFloat($('cpfSARate').value) / 100 || 0.04;
+
+  // Assets
+  const cpfOA = parseFloat($('cpfOA').value) || 0;
+  const cpfSA = parseFloat($('cpfSA').value) || 0;
+  const cpfMA = parseFloat($('cpfMA').value) || 0;
+  const propPrimary = parseFloat($('propPrimary').value) || 0;
+  const propInvest = parseFloat($('propInvest').value) || 0;
+  const mortgage = parseFloat($('mortgage').value) || 0;
+  const inclProp = $('inclProp').checked;
+  const stocks = parseFloat($('stocks').value) || 0;
+  const bonds = parseFloat($('bonds').value) || 0;
+  const reits = parseFloat($('reits').value) || 0;
+  const cash = parseFloat($('cash').value) || 0;
+  const endowment = parseFloat($('endowment').value) || 0;
+  const otherAssets = parseFloat($('otherAssets').value) || 0;
+  const otherDebts = parseFloat($('otherDebts').value) || 0;
+
+  // Income (current)
+  const salary = parseFloat($('salary').value) || 0;
+  const sideIncome = parseFloat($('sideIncome').value) || 0;
+  const bonus = parseFloat($('bonus').value) || 0;
+  const savingsRate = parseFloat($('savingsRate').value) / 100 || 0.3;
+  const rentalIncome = parseFloat($('rentalIncome').value) || 0;
+  const dividendIncome = parseFloat($('dividendIncome').value) || 0;
+  const interestIncome = parseFloat($('interestIncome').value) || 0;
+  const otherPassive = parseFloat($('otherPassive').value) || 0;
+
+  // Retirement income
+  const cpfLife = parseFloat($('cpfLife').value) || 0;
+  const retirRental = parseFloat($('retirRental').value) || 0;
+  const retirDividend = parseFloat($('retirDividend').value) || 0;
+  const retirActive = parseFloat($('retirActive').value) || 0;
+  const retirOther = parseFloat($('retirOther').value) || 0;
+
+  // Advanced
+  const estateBuffer = $('estateBuffer').checked ? 1.1 : 1.0;
+  const strategy = $('withdrawalStrategy').value;
+
+  // ─── NET WORTH TODAY ───────────────────────────────────────────
+  const liquidInvested = stocks + bonds + reits + cash + endowment + otherAssets;
+  const cpfTotal = cpfOA + cpfSA + cpfMA;
+  const propNet = (inclProp ? (propPrimary + propInvest) : 0) - mortgage;
+  const netWorth = liquidInvested + cpfTotal + propNet - otherDebts;
+
+  // ─── INFLATION-ADJUSTED MONTHLY EXPENSES AT RETIREMENT ────────
+  const infFactor = Math.pow(1 + inflation, yearsToRetire);
+  const healthFactor = Math.pow(1 + healthInflation, yearsToRetire);
+  const adjBasic = expBasic * infFactor;
+  const adjHealth = expHealth * healthFactor;
+  const adjLeisure = expLeisure * infFactor;
+  const adjFamily = expFamily * infFactor;
+  const adjEmerg = expEmerg * infFactor;
+  const adjMedishield = medishield * healthFactor;
+  const adjMonthlyExp = adjBasic + adjHealth + adjLeisure + adjFamily + adjEmerg + adjMedishield;
+  const adjAnnualExp = adjMonthlyExp * 12;
+
+  // ─── TARGET RETIREMENT SUM ────────────────────────────────────
+  let targetSum;
+  const realReturn = retirReturn - inflation;
+  if (strategy === '4pct') {
+    targetSum = adjAnnualExp * 25 * estateBuffer;
+  } else if (strategy === 'bucket') {
+    // Bucket 1: 2yr cash, Bucket 2: 8yr bonds, Bucket 3: rest equity
+    const bucket1 = adjAnnualExp * 2;
+    const bucket2 = adjAnnualExp * 8 * 0.9;
+    const pvRemaining = realReturn > 0.001
+      ? adjAnnualExp * (1 - Math.pow(1 + realReturn, -(retireDuration - 10))) / realReturn
+      : adjAnnualExp * (retireDuration - 10);
+    targetSum = (bucket1 + bucket2 + pvRemaining) * estateBuffer;
+  } else {
+    // Dynamic withdrawal — PV of income floor
+    const incomeFloor = Math.max(adjAnnualExp * 0.6, 0);
+    const pvFloor = realReturn > 0.001
+      ? incomeFloor * (1 - Math.pow(1 + realReturn, -retireDuration)) / realReturn
+      : incomeFloor * retireDuration;
+    targetSum = pvFloor * 1.4 * estateBuffer;
+  }
+
+  // ─── PROJECT LIQUID INVESTED ASSETS ──────────────────────────
+  const monthlySavings = (salary + sideIncome) * savingsRate + (bonus / 12);
+  const annualSavings = monthlySavings * 12;
+  const annualPassiveIncome = (rentalIncome + dividendIncome + interestIncome + otherPassive) * 12;
+
+  // CPF projections
+  const cpfOAAtRetire = cpfOA * Math.pow(1 + cpfOARate, yearsToRetire);
+  const cpfSAAtRetire = cpfSA * Math.pow(1 + cpfSARate, yearsToRetire);
+  const cpfMAAtRetire = cpfMA * Math.pow(1 + 0.04, yearsToRetire);
+  const cpfAtRetire = cpfOAAtRetire + cpfSAAtRetire + cpfMAAtRetire;
+
+  // Property at retirement
+  const propAtRetire = inclProp ? ((propPrimary + propInvest) * Math.pow(1 + propGrowth, yearsToRetire) - Math.max(0, mortgage - annualSavings * 0.3 * yearsToRetire)) : 0;
+
+  // Liquid portfolio at retirement (FV of current + annual savings)
+  const liquidAtRetire = liquidInvested * Math.pow(1 + investReturn, yearsToRetire)
+    + annualSavings * (Math.pow(1 + investReturn, yearsToRetire) - 1) / investReturn;
+
+  const projNetWorth = liquidAtRetire + cpfAtRetire + propAtRetire;
+
+  // ─── GAP ANALYSIS ─────────────────────────────────────────────
+  // Only investable assets fund the gap (not CPF Life which is income, not property if illiquid)
+  // CPF RA assumed to fund CPF LIFE
+  const retirementRA = Math.min(cpfSAAtRetire, 300000); // rough RA cap
+  const investableAtRetire = liquidAtRetire + (cpfOAAtRetire * 0.5); // OA can partially fund
+  const gap = investableAtRetire - targetSum;
+
+  // ─── RETIREMENT INCOME ────────────────────────────────────────
+  const cpfLifeAdj = cpfAge <= retAge ? cpfLife * infFactor : 0; // if CPF starts before/at retire
+  const totalRetirIncomeMonthly = cpfLifeAdj + retirRental + retirDividend + retirActive + retirOther;
+  const totalRetirIncomeAnnual = totalRetirIncomeMonthly * 12;
+  const incomeGap = adjMonthlyExp - totalRetirIncomeMonthly;
+  const incomeCoverPct = (totalRetirIncomeMonthly / adjMonthlyExp) * 100;
+
+  // ─── SUB-SCORES ───────────────────────────────────────────────
+  const subAsset = clamp((investableAtRetire / targetSum) * 100, 0, 100);
+  const subIncome = clamp(incomeCoverPct, 0, 100);
+  const savingsRatePct = (annualSavings / Math.max(1, (salary + sideIncome + bonus) * 12)) * 100;
+  const subSavings = clamp(savingsRatePct * 2.5, 0, 100);
+  const subTime = clamp(yearsToRetire >= 30 ? 100 : (yearsToRetire / 30) * 100, 0, 100);
+  const assetTypes = [liquidInvested > 0, cpfTotal > 0, (propPrimary + propInvest) > 0, rentalIncome > 0, dividendIncome > 0].filter(Boolean).length;
+  const subDiv = clamp(assetTypes * 20, 0, 100);
+  const totalScore = Math.round(subAsset * 0.30 + subIncome * 0.25 + subSavings * 0.20 + subTime * 0.15 + subDiv * 0.10);
+
+  // ─── UPDATE UI ────────────────────────────────────────────────
+  // Header
+  $('header-score').textContent = totalScore;
+  $('header-score').style.color = getColor(totalScore);
+  $('grade-label').textContent = getGrade(totalScore);
+
+  // Summary cards
+  $('c-targetSum').textContent = fmtS(targetSum);
+  $('c-projNW').textContent = fmtS(projNetWorth);
+  $('c-yearsToRetire').textContent = yearsToRetire + ' yrs';
+  $('c-retirDuration').textContent = retireDuration + ' yrs';
+  $('c-netWorth').textContent = fmtS(netWorth);
+  $('c-gap').textContent = (gap >= 0 ? '+' : '-') + fmtS(gap);
+  $('c-gap').style.color = gap >= 0 ? 'var(--green)' : 'var(--red)';
+  $('c-gapSub').textContent = gap >= 0 ? 'Projected surplus at retirement' : 'Projected shortfall — action needed';
+
+  // Index meter
+  $('bigScore').textContent = totalScore;
+  $('bigScore').style.color = getColor(totalScore);
+  $('bigGrade').textContent = getGrade(totalScore);
+  $('bigGrade').style.color = getColor(totalScore);
+  $('mainMeter').style.width = totalScore + '%';
+  $('mainMeter').style.background = getColor(totalScore);
+
+  [['sub-asset', subAsset, 'var(--blue)'], ['sub-income', subIncome, 'var(--green)'],
+   ['sub-savings', subSavings, 'var(--accent)'], ['sub-time', subTime, 'var(--purple)'],
+   ['sub-div', subDiv, '#26d0ce']].forEach(([id, val, color]) => {
+    $(id).style.width = val + '%';
+    $(id).style.background = color;
+    $(id + '-val').textContent = Math.round(val);
+  });
+
+  // ─── RETIREMENT INCOME ROWS ────────────────────────────────────
+  const incomeItems = [
+    { name: 'CPF LIFE Payout', desc: `From age ${cpfAge}`, amount: cpfLifeAdj, color: '#58a6ff' },
+    { name: 'Rental Income', desc: 'Net property rental', amount: retirRental, color: '#3ddc97' },
+    { name: 'Dividend / Portfolio', desc: 'REITs, stocks, ETFs', amount: retirDividend, color: '#e8c547' },
+    { name: 'Part-time / Active', desc: 'Consultancy, part-time work', amount: retirActive, color: '#bc8cff' },
+    { name: 'Other Passive', desc: 'Royalties, digital, misc', amount: retirOther, color: '#26d0ce' },
+  ].filter(i => i.amount > 0);
+
+  const totalInc = incomeItems.reduce((s, i) => s + i.amount, 0);
+  $('income-rows').innerHTML = incomeItems.map(i => `
+    <div class="income-row">
+      <div class="income-left">
+        <div class="income-dot" style="background:${i.color}"></div>
+        <div><div class="income-name">${i.name}</div><div class="income-desc">${i.desc}</div></div>
+      </div>
+      <div class="income-right">
+        <div class="income-amount" style="color:${i.color}">${fmtS(i.amount)}/mo</div>
+        <div class="income-pct">${totalInc > 0 ? ((i.amount/totalInc)*100).toFixed(0) + '% of income' : ''}</div>
+      </div>
+    </div>`).join('');
+
+  $('income-total-row').textContent = fmtS(totalInc) + '/mo vs ' + fmtS(adjMonthlyExp) + '/mo needed';
+  $('income-total-row').style.color = totalInc >= adjMonthlyExp ? 'var(--green)' : 'var(--red)';
+  $('income-cover-pct').textContent = incomeCoverPct.toFixed(0) + '% of expenses covered by passive income';
+
+  // ─── ALERTS ───────────────────────────────────────────────────
+  const alerts = [];
+  if (gap < 0) alerts.push({ type: 'bad', icon: '🚨', title: 'Retirement Shortfall Detected', msg: `Your projected investable assets fall short of the target by ${fmtS(Math.abs(gap))}. Increase savings rate, delay retirement by ${Math.ceil(Math.abs(gap) / (annualSavings * Math.pow(1+investReturn, yearsToRetire/2)))} years, or boost investment returns.` });
+  if (incomeCoverPct < 50) alerts.push({ type: 'bad', icon: '⚠️', title: 'Low Passive Income Coverage', msg: `Your expected retirement passive income covers only ${incomeCoverPct.toFixed(0)}% of expenses. Consider adding REITs, dividend stocks, or rental property.` });
+  if (savingsRate < 0.15) alerts.push({ type: 'warn', icon: '💡', title: 'Low Savings Rate', msg: `Saving ${fmtPct(savingsRate * 100)} of income may not be sufficient. Aim for at least 20–30% for a comfortable retirement.` });
+  if (retAge < cpfAge) alerts.push({ type: 'warn', icon: '🏛️', title: 'CPF LIFE Gap Period', msg: `You plan to retire at ${retAge} but CPF LIFE starts at ${cpfAge}. You need ${cpfAge - retAge} years of bridge income before payouts begin.` });
+  if (gap >= 0 && incomeCoverPct >= 70) alerts.push({ type: 'good', icon: '✅', title: 'On Track for Retirement', msg: `You have a projected surplus of ${fmtS(gap)} and ${incomeCoverPct.toFixed(0)}% income coverage. Keep compounding and revisit annually.` });
+  if (subDiv < 40) alerts.push({ type: 'warn', icon: '📦', title: 'Low Asset Diversification', msg: 'Consider diversifying across property, equities, CPF, and passive income streams to reduce sequence-of-returns risk.' });
+
+  $('alerts-container').innerHTML = alerts.map(a => `
+    <div class="alert ${a.type}">
+      <div class="alert-icon">${a.icon}</div>
+      <div class="alert-text"><strong>${a.title}</strong><span>${a.msg}</span></div>
+    </div>`).join('');
+
+  // ─── CHARTS ───────────────────────────────────────────────────
+  const years = Array.from({length: yearsToRetire + 1}, (_, i) => curAge + i);
+  const netWorthData = years.map((age, i) => {
+    const liq = liquidInvested * Math.pow(1+investReturn, i) + annualSavings * (i > 0 ? (Math.pow(1+investReturn, i)-1)/investReturn : 0);
+    const cpf = (cpfOA * Math.pow(1+cpfOARate,i)) + (cpfSA * Math.pow(1+cpfSARate,i)) + (cpfMA * Math.pow(1+0.04,i));
+    const prop = inclProp ? ((propPrimary + propInvest) * Math.pow(1+propGrowth,i) - Math.max(0, mortgage - annualSavings*0.3*i)) : 0;
+    return Math.round(liq + cpf + prop);
+  });
+
+  drawLineChart('growthChart',
+    years.map(a => 'Age '+a),
+    [{ label: 'Projected Net Worth', data: netWorthData, borderColor: 'var(--accent)', backgroundColor: 'rgba(232,197,71,0.08)', fill: true },
+     { label: 'Target Sum', data: years.map(() => Math.round(targetSum)), borderColor: 'var(--red)', borderDash: [5,5] }]
+  );
+
+  // Asset allocation donut
+  const assetLabels = [], assetData = [], assetColors = [];
+  if (stocks > 0) { assetLabels.push('Stocks/ETFs'); assetData.push(stocks); assetColors.push('#58a6ff'); }
+  if (bonds > 0) { assetLabels.push('Bonds/FD'); assetData.push(bonds); assetColors.push('#3ddc97'); }
+  if (reits > 0) { assetLabels.push('REITs'); assetData.push(reits); assetColors.push('#e8c547'); }
+  if (cash > 0) { assetLabels.push('Cash/SSB'); assetData.push(cash); assetColors.push('#bc8cff'); }
+  if (endowment > 0) { assetLabels.push('Endowment'); assetData.push(endowment); assetColors.push('#26d0ce'); }
+  if (cpfOA + cpfSA > 0) { assetLabels.push('CPF'); assetData.push(cpfOA + cpfSA); assetColors.push('#f0a500'); }
+  if (inclProp && propPrimary + propInvest > 0) { assetLabels.push('Property'); assetData.push(propPrimary + propInvest - mortgage); assetColors.push('#ff6b6b'); }
+  if (assetData.length > 0) drawDoughnutChart('assetChart', assetLabels, assetData, assetColors);
+
+  // Retirement income donut
+  const rIncLabels = [], rIncData = [], rIncColors = [];
+  if (cpfLifeAdj > 0) { rIncLabels.push('CPF LIFE'); rIncData.push(cpfLifeAdj); rIncColors.push('#58a6ff'); }
+  if (retirRental > 0) { rIncLabels.push('Rental'); rIncData.push(retirRental); rIncColors.push('#3ddc97'); }
+  if (retirDividend > 0) { rIncLabels.push('Dividends'); rIncData.push(retirDividend); rIncColors.push('#e8c547'); }
+  if (retirActive > 0) { rIncLabels.push('Part-time'); rIncData.push(retirActive); rIncColors.push('#bc8cff'); }
+  if (retirOther > 0) { rIncLabels.push('Other'); rIncData.push(retirOther); rIncColors.push('#26d0ce'); }
+  const gapIncome = Math.max(0, adjMonthlyExp - totalInc);
+  if (gapIncome > 0) { rIncLabels.push('Portfolio Draw'); rIncData.push(gapIncome); rIncColors.push('#ff6b6b'); }
+  if (rIncData.length > 0) drawDoughnutChart('incomeChart', rIncLabels, rIncData, rIncColors);
+
+  // Drawdown chart
+  const ddYears = Array.from({length: retireDuration + 1}, (_, i) => retAge + i);
+  let portfolioBalance = investableAtRetire;
+  const drawdownData = ddYears.map((age, i) => {
+    if (i === 0) return Math.round(portfolioBalance);
+    const annualGrowth = portfolioBalance * retirReturn;
+    const annualWithdrawal = Math.max(0, (adjAnnualExp * Math.pow(1+inflation, i)) - (totalRetirIncomeAnnual * Math.pow(1+inflation*0.5, i)));
+    portfolioBalance = portfolioBalance + annualGrowth - annualWithdrawal;
+    return Math.round(Math.max(0, portfolioBalance));
+  });
+  drawLineChart('drawdownChart',
+    ddYears.map(a => 'Age '+a),
+    [{ label: 'Portfolio Balance', data: drawdownData, borderColor: 'var(--blue)', backgroundColor: 'rgba(88,166,255,0.08)', fill: true }]
+  );
+
+  // ─── PROJECTION TABLE ────────────────────────────────────────
+  const rows = [];
+  const milestones = new Set([curAge, Math.min(curAge+5, retAge-1), Math.min(curAge+10, retAge-1), retAge, cpfAge, lifeExp]);
+  for (let i = 0; i <= Math.min(yearsToRetire, 35); i += (yearsToRetire > 25 ? 5 : yearsToRetire > 15 ? 3 : 1)) {
+    milestones.add(curAge + i);
+  }
+  [...milestones].sort((a,b)=>a-b).filter(a => a >= curAge && a <= lifeExp).forEach(age => {
+    const i = age - curAge;
+    if (i < 0) return;
+    const yi = Math.min(i, yearsToRetire);
+    const liq = liquidInvested * Math.pow(1+investReturn, yi) + annualSavings * (yi > 0 ? (Math.pow(1+investReturn,yi)-1)/investReturn : 0);
+    const cpf = (cpfOA*Math.pow(1+cpfOARate,yi))+(cpfSA*Math.pow(1+cpfSARate,yi))+(cpfMA*Math.pow(1+0.04,yi));
+    const prop = inclProp ? ((propPrimary+propInvest)*Math.pow(1+propGrowth,yi) - Math.max(0,mortgage-annualSavings*0.3*yi)) : 0;
+    const nw = liq + cpf + prop;
+    const annSav = age < retAge ? (annualSavings * Math.pow(1+salaryGrowth, yi)).toFixed(0) : '—';
+    const passInc = (age < retAge ? annualPassiveIncome : totalRetirIncomeAnnual * 12) * Math.pow(1+inflation, yi);
+    const notes = [];
+    if (age === retAge) notes.push('🎯 Retirement');
+    if (age === cpfAge) notes.push('🏛️ CPF LIFE starts');
+    if (age === lifeExp) notes.push('📅 Life expectancy');
+    rows.push(`<tr class="${notes.length ? 'milestone' : ''} ${age === retAge ? 'highlight' : ''}">
+      <td>Age ${age} (${new Date().getFullYear() + (age - curAge)})</td>
+      <td>${fmtS(liq)}</td>
+      <td>${fmtS(cpf)}</td>
+      <td>${fmtS(nw)}</td>
+      <td>${annSav !== '—' ? fmtS(parseInt(annSav)) : '—'}</td>
+      <td>${fmtS(Math.round(passInc / 12))}/mo</td>
+      <td>${notes.join(' ')}</td>
+    </tr>`);
+  });
+  $('projBody').innerHTML = rows.join('');
+}
+
+// ─── LOAD CHART.JS ────────────────────────────────────────────────
+(function loadChartJS() {
+  const s = document.createElement('script');
+  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
+  s.onload = () => calc();
+  s.onerror = () => {
+    // Fallback: hide canvas, show text note
+    document.querySelectorAll('canvas').forEach(c => {
+      c.parentElement.innerHTML += '<div style="color:var(--text3);font-size:12px;text-align:center;padding:20px">Charts require internet connection for first load. All calculations still work offline.</div>';
+    });
+    calc();
+  };
+  document.head.appendChild(s);
+})();
+</script>
+
+</body>
+</html>
