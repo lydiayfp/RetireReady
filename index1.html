@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>RetireReady SG</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#0f1318;--s1:#171c24;--s2:#1e2530;--s3:#252e3c;
+  --brd:#2c3648;--gold:#e8c547;--gold2:#c9a82c;
+  --grn:#35d07a;--red:#f05454;--blu:#5b9cf6;--purp:#a78bfa;--teal:#2dd4bf;
+  --txt:#e8edf4;--txt2:#9aa3b0;--txt3:#5c6880;
+}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;line-height:1.5}
+
+/* HEADER */
+#hdr{position:fixed;top:0;left:0;right:0;z-index:200;background:var(--bg);border-bottom:1px solid var(--brd);display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:52px}
+.logo{display:flex;align-items:center;gap:8px}
+.logo h1{font-size:18px;font-weight:800;color:var(--gold);white-space:nowrap}
+.logo span{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:1px;white-space:nowrap}
+#badge{display:flex;align-items:center;gap:10px;background:var(--s2);border:1px solid var(--brd);border-radius:28px;padding:5px 14px 5px 10px}
+.blbl{font-size:9px;color:var(--txt3);text-transform:uppercase;letter-spacing:.8px}
+.bgrade{font-size:11px;font-weight:700;color:var(--gold)}
+.bnum{font-size:24px;font-weight:900;color:var(--txt);line-height:1;transition:color .3s}
+
+/* TABS */
+#tabs{position:fixed;top:52px;left:0;right:0;z-index:190;background:var(--s1);border-bottom:1px solid var(--brd);display:flex}
+.ptab{flex:1;text-align:center;padding:10px 6px;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--txt3);cursor:pointer;border-bottom:2px solid transparent;transition:.2s;user-select:none}
+.ptab.on{color:var(--gold);border-bottom-color:var(--gold)}
+
+/* PAGES */
+.page{position:fixed;top:92px;left:0;right:0;bottom:0;overflow-y:auto;-webkit-overflow-scrolling:touch;display:none}
+.page.on{display:block}
+
+/* INPUT PAGE */
+#pg-input{background:var(--bg)}
+.ibody{padding:14px;padding-bottom:48px;max-width:620px;margin:0 auto}
+
+/* CARDS */
+.card{background:var(--s1);border:1px solid var(--brd);border-radius:14px;margin-bottom:12px;overflow:hidden}
+.card-hdr{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--brd);background:var(--s2)}
+.card-hdr .ico{font-size:17px}
+.card-hdr h3{font-size:13px;font-weight:700;color:var(--gold);letter-spacing:.3px}
+.card-body{padding:14px 16px 16px}
+
+/* FIELDS */
+.field{margin-bottom:14px}
+.field:last-child{margin-bottom:0}
+.field>label{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--txt2);margin-bottom:7px}
+.hint{font-size:10px;color:var(--txt3);margin-top:4px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+
+/* SLIDER CONTROL */
+.sc{background:var(--s3);border:1px solid var(--brd);border-radius:10px;padding:10px 12px}
+.sc-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.sc-v{font-size:20px;font-weight:900;color:var(--txt);line-height:1;letter-spacing:-.5px}
+.sc-u{font-size:11px;color:var(--txt2);margin-left:2px}
+.sc input[type=range]{
+  -webkit-appearance:none;appearance:none;display:block;
+  width:100%;height:5px;border-radius:3px;outline:none;border:none;margin:0;padding:0;cursor:pointer;
+  background:linear-gradient(90deg,var(--gold) var(--pct,50%),var(--brd) var(--pct,50%));
+}
+.sc input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--gold);border:3px solid var(--bg);box-shadow:0 0 0 2px rgba(232,197,71,.4);cursor:pointer}
+.sc input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--gold);border:3px solid var(--bg);cursor:pointer}
+.sc-mm{display:flex;justify-content:space-between;margin-top:3px;font-size:9px;color:var(--txt3)}
+
+/* TOGGLE */
+.trow{display:flex;align-items:center;justify-content:space-between;padding:6px 0;margin-bottom:8px}
+.trow .tl{font-size:12px;color:var(--txt2)}
+.tog{position:relative;width:40px;height:22px;cursor:pointer;flex-shrink:0}
+.tog input{opacity:0;position:absolute;width:0;height:0}
+.tt{position:absolute;inset:0;background:var(--s3);border:1px solid var(--brd);border-radius:11px;transition:.2s}
+.tog input:checked+.tt{background:var(--gold);border-color:var(--gold2)}
+.th{position:absolute;top:3px;left:3px;width:16px;height:16px;background:#fff;border-radius:50%;transition:.2s;pointer-events:none}
+.tog input:checked~.th{transform:translateX(18px)}
+
+/* SELECT */
+select.fsel{width:100%;background:var(--s3);border:1px solid var(--brd);border-radius:10px;color:var(--txt);padding:12px 14px;font-size:14px;outline:none;-webkit-appearance:none;appearance:none}
+
+/* RESULTS PAGE */
+#pg-results{background:var(--bg)}
+.rbody{padding:14px;padding-bottom:48px;max-width:700px;margin:0 auto}
+
+/* SUMMARY GRID */
+.sg{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
+.sc2{background:var(--s1);border:1px solid var(--brd);border-radius:14px;padding:14px 12px;position:relative;overflow:hidden}
+.sc2::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.sc2.gold::before{background:linear-gradient(90deg,var(--gold),var(--gold2))}
+.sc2.grn::before{background:linear-gradient(90deg,var(--grn),#1aad5e)}
+.sc2.red::before{background:linear-gradient(90deg,var(--red),#c0392b)}
+.sc2.blu::before{background:linear-gradient(90deg,var(--blu),#3a7ad9)}
+.sc2.purp::before{background:linear-gradient(90deg,var(--purp),#7c5ce8)}
+.sc2.teal::before{background:linear-gradient(90deg,var(--teal),#0ea5a0)}
+.sc-ico{font-size:16px;margin-bottom:5px}
+.sc-lbl{font-size:9px;color:var(--txt3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px}
+.sc-val{font-size:14px;font-weight:900;color:var(--txt);letter-spacing:-.3px;line-height:1.2}
+.sc-sub{font-size:9px;color:var(--txt3);margin-top:3px}
+
+/* INDEX */
+.ixc{background:var(--s1);border:1px solid var(--brd);border-radius:14px;padding:16px;margin-bottom:12px}
+.ix-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;gap:10px}
+.ix-title{font-size:15px;font-weight:700;color:var(--txt);margin-bottom:3px}
+.ix-sub{font-size:11px;color:var(--txt3)}
+.ix-score .sn{font-size:42px;font-weight:900;line-height:1;transition:color .3s}
+.ix-score .sd{font-size:16px;color:var(--txt3)}
+.ix-score .sg2{font-size:11px;font-weight:700;letter-spacing:1.2px;margin-top:2px}
+.mtr{height:12px;background:var(--s3);border-radius:6px;overflow:hidden;margin-bottom:5px}
+.mf{height:100%;border-radius:6px;transition:width .5s cubic-bezier(.4,0,.2,1),background .4s;position:relative;overflow:hidden}
+.mf::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent);animation:sh 2s infinite}
+@keyframes sh{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+.mmarks{display:flex;justify-content:space-between;font-size:9px;color:var(--txt3);margin-bottom:14px}
+.sbars{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.sb{text-align:center}
+.sb-l{font-size:9px;color:var(--txt3);text-transform:uppercase;letter-spacing:.3px;margin-bottom:5px;line-height:1.3}
+.sb-t{height:5px;background:var(--s3);border-radius:3px;overflow:hidden;margin-bottom:3px}
+.sb-f{height:100%;border-radius:3px;transition:width .4s}
+.sb-n{font-size:12px;font-weight:900}
+
+/* INCOME */
+.inc{background:var(--s1);border:1px solid var(--brd);border-radius:14px;padding:16px;margin-bottom:12px}
+.irow{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(44,54,72,.5)}
+.irow:last-of-type{border:none}
+.il{display:flex;align-items:center;gap:9px}
+.idot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.iname{font-size:12px;font-weight:700}
+.idesc{font-size:10px;color:var(--txt3)}
+.ir{text-align:right}
+.iamt{font-size:14px;font-weight:900}
+.ipct{font-size:10px;color:var(--txt3)}
+.itot{background:var(--s2);border-radius:10px;padding:11px 14px;margin-top:10px;display:flex;justify-content:space-between;align-items:center}
+.itot .il2{font-size:11px;color:var(--txt2);font-weight:700}
+.itot .iv{font-size:15px;font-weight:900}
+
+/* CHARTS */
+.cg{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.cc{background:var(--s1);border:1px solid var(--brd);border-radius:14px;padding:16px}
+.cc-t{font-size:13px;font-weight:700;color:var(--txt);margin-bottom:2px}
+.cc-s{font-size:10px;color:var(--txt3);margin-bottom:12px}
+canvas{display:block;width:100%!important}
+.dw{position:relative;max-width:190px;margin:0 auto}
+.dc{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none}
+.dc-n{font-size:16px;font-weight:900;color:var(--txt)}
+.dc-l{font-size:9px;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px}
+.leg{display:flex;flex-wrap:wrap;gap:5px 10px;margin-top:10px}
+.li{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--txt2)}
+.ld{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* ALERTS */
+.alts{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.alt{display:flex;gap:9px;padding:11px 13px;border-radius:10px;border:1px solid;font-size:12px;line-height:1.5}
+.alt.bad{background:rgba(240,84,84,.07);border-color:rgba(240,84,84,.3)}
+.alt.warn{background:rgba(240,165,0,.07);border-color:rgba(240,165,0,.3)}
+.alt.good{background:rgba(53,208,122,.06);border-color:rgba(53,208,122,.25)}
+.alt .ai{font-size:14px;flex-shrink:0;padding-top:1px}
+.alt strong{display:block;font-size:12px;margin-bottom:1px}
+.alt span{color:var(--txt2)}
+
+/* TABLE */
+.pc{background:var(--s1);border:1px solid var(--brd);border-radius:14px;padding:16px;margin-bottom:12px}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:11px;min-width:480px}
+th{background:var(--s2);color:var(--txt3);font-size:9px;text-transform:uppercase;letter-spacing:.7px;padding:8px 10px;text-align:right;border-bottom:1px solid var(--brd);white-space:nowrap}
+th:first-child{text-align:left}
+td{padding:7px 10px;text-align:right;border-bottom:1px solid rgba(44,54,72,.35);color:var(--txt2)}
+td:first-child{text-align:left;color:var(--txt);font-weight:700}
+tr:hover td{background:var(--s2)}
+tr.mile td{background:rgba(232,197,71,.04)}
+tr.hl td{color:var(--gold);font-weight:900}
+
+.foot{text-align:center;color:var(--txt3);font-size:10px;padding:16px;border-top:1px solid var(--brd)}
+
+/* RESPONSIVE */
+@media(max-width:520px){
+  .sg{grid-template-columns:1fr 1fr}
+  .cg{grid-template-columns:1fr}
+  .sbars{grid-template-columns:repeat(3,1fr)}
+  .ix-top{flex-direction:column}
+  .g3{grid-template-columns:1fr 1fr}
+}
+@media(max-width:360px){
+  .g2,.g3{grid-template-columns:1fr}
+  .sg{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<div id="hdr">
+  <div class="logo"><h1>RetireReady</h1><span>SG Planner</span></div>
+  <div id="badge">
+    <div><div class="blbl">Readiness</div><div class="bgrade" id="hgrade">—</div></div>
+    <div class="bnum" id="hscore">—</div>
+  </div>
+</div>
+
+<div id="tabs">
+  <div class="ptab on" onclick="showPage('input',this)">📋 All Inputs</div>
+  <div class="ptab" onclick="showPage('results',this)">📊 Results & Charts</div>
+</div>
+
+<!-- ═══════ INPUT PAGE ═══════ -->
+<div class="page on" id="pg-input"><div class="ibody">
+
+<!-- PROFILE -->
+<div class="card">
+  <div class="card-hdr"><span class="ico">👤</span><h3>Personal Profile</h3></div>
+  <div class="card-body">
+    <div class="g2">
+      <div class="field"><label>Current Age</label>
+        <div class="sc">
+          <div class="sc-top"><span class="sc-v" id="v-curAge">35</span><span class="sc-u">yrs</span></div>
+          <input type="range" id="s-curAge" min="18" max="75" value="35" oninput="upd(this,'v-curAge');calc()">
+          <div class="sc-mm"><span>18</span><span>75</span></div>
+        </div>
+      </div>
+      <div class="field"><label>Planned Retire Age</label>
+        <div class="sc">
+          <div class="sc-top"><span class="sc-v" id="v-retAge">62</span><span class="sc-u">yrs</span></div>
+          <input type="range" id="s-retAge" min="45" max="80" value="62" oninput="upd(this,'v-retAge');calc()">
+          <div class="sc-mm"><span>45</span><span>80</span></div>
+        </div>
+      </div>
+      <div class="field"><label>CPF Payout Age</label>
+        <div class="sc">
+          <div class="sc-top"><span class="sc-v" id="v-cpfAge">65</span><span class="sc-u">yrs</span></div>
+          <input type="range" id="s-cpfAge" min="60" max="70" value="65" oninput="upd(this,'v-cpfAge');calc()">
+          <div class="sc-mm"><span>60</span><span>70</span></div>
+        </div>
+        <div class="hint">CPF LIFE commencement age</div>
+      </div>
+      <div class="field"><label>Life Expectancy</label>
+        <div class="sc">
+          <div class="sc-top"><span class="sc-v" id="v-lifeExp">88</span><span class="sc-u">yrs</span></div>
+          <input type="range" id="s-lifeExp" min="70" max="100" value="88" oninput="upd(this,'v-lifeExp');calc()">
+          <div class="sc-mm"><span>70</span><span>100</span></div>
+        </div>
+        <div class="hint">SG avg: ♀87 ♂84</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EXPENSES -->
+<div class="card">
+  <div class="card-hdr"><span class="ico">💸</span><h3>Monthly Retirement Expenses</h3></div>
+  <div class="card-body">
+    <div class="field"><label>Basic Living (food, transport, household)</label>
+      <div class="sc">
+        <div class="sc-top"><span class="sc-u">S$</span><span class="sc-v" id="v-eBasic">2,500</span></div>
+        <input type="range" id="s-eBasic" min="500" max="10000" step="100" value="2500" oninput="upd(this,'v-eBasic',true);calc()">
+        <div class="sc-mm"><span>S$500</span><span>S$10,000</span></div>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="field"><label>Healthcare / Insurance</label>
+        <div class="sc">
+          <div class="sc-top"><span class="sc-u">S$</span><span class="sc-v" id="v-eHealth">600</span></div>
+          <input type="range" id="s-eHealth" min="0" max="5000" step="50" value="600" oninput="upd(this,'v-eHealth',true);calc()">
+          <div class="sc-mm"><span>0</span><span>5,000</span></div>
+        </div>
+      </div>
+      <div class="field"><label>Leisure / Travel</label>
+        <div class="sc">
+          <div class="sc-top"><span class="sc-u">S$</span><span class="sc-v" id="v-eLeisure">800</span></div>
+          <input type="range" id="s-eLeisure" min="0" max="5000" step="50" value="800" oninput="upd(this,'v-eLeisure',true);calc()">
+          <div class="sc-mm"><span>0</span><span>5,000</span></div>
+        </div>
+      </div>
+      <div class="field"><label>Family / Dependants</label>
+        <div class="sc">
+          <div class="sc-top"><span class="sc-u">S$</span><span class="sc-v" id="v-eFamily">300</span></div>
+          <input type="range" id="s-eFamily" min="0" max="3000" step="50" value="300" oninput="upd(this,'v-eFamily',true);calc()">
+          <div class="sc-mm"><span>0</span><span>3,000</span></div>
+        </div>
+      </div>
+      <div class="field"><label>Emergency Buffer</label>
+        <div class="sc">
+          <div class="sc-top"><span class="sc-u">S$</span><span class="sc-v" id="v-eEmerg">200</span></div>
+          <input type="range" id="s-eEmerg" min="0" max="2000" step="50" value="200" oninput="upd(this,'v-eEmerg',true);calc()">
+          <div class="sc-mm"><span>0</span><span>2,000</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="trow">
+      <span class="tl">Include MediShield/CareShield premiums (~S$200/mo)</span>
+      <label class="tog"><input type="checkbox" id="ck-med" checked onchange="calc()"><div class="tt"></div><div class="th"></div></label>
+    </div>
+  </div>
+</div>
+
+<!-- CPF -->
+<div class="card">
+  <div class="card-hdr"><span class="ico">🏛️</span><h3>CPF Balances</h3></div>
+  <div class="card-body">
+    <div class="g2">
+      <div class="field"><label>Ordinary Account (OA) · 2.5%pa</label>
+        <div class="sc">
+          <div class="sc-top"><span class="sc-u">S$</span><span class="sc-v" id="v-cpfOA">80,000</span></div>
+          <input type="range" id="s-cpfOA" min="0" max="500000" step="1000" value="80000" oninput="upd(this,'v-cpfOA',true);calc()">
+          <div class="sc-mm"><span>0</span><span>500k</span></div>
+        </div>
+      </div>
+      <div class="field"><label>Special Account (SA) · 4%pa</label>
+        <div class="sc">
+          <div class="sc-top"><span class="sc-u">S$</span><span class="sc-v" id="v-cpfSA">45,000</span></div>
+          <input type="range" id="s-cpfSA" min="0" max="300000" step="1000" value="45000" oninput="upd(this,'v-cpfSA',true);calc()">
+          <div class="sc-mm"><span>0</span><span>300k</span></div>
+        </div>
+      </div>
+      <div class="field"><label>MediSave (MA) · 4%pa</label>
+        <div class="sc">
+          <div class="sc-top"><span class="sc-u">S$</span><span class="sc-v" id="v-cpfMA">30,000</span></div>
+          <input type="range" id="s-cpfMA" min="0" max="100000" step="1000" value="30000" oninput="upd(this,'v-cpfMA',true);calc()">
+          <div class="sc-mm"><span>0</span><span>100k</span></div>
+        </div>
+      </div>
+      <div class="field"><label>Expected CPF LIFE Payout/mo</label>
+        <div class="sc">
+          <div class="sc-top"><span class="sc-u">S$</span><span class="sc-v" id="v-cpfLife">1,500</span></div>
+          <input type="range" id="s-cpfLife" min="0" max="5000" step="50" value="1500" oninput="upd(this,'v-cpfLife',true);calc()">
+          <div class="sc-mm"><span>0</span><span>5,000</span></div>
+        </div>
+        <div class="hint">From CPF LIFE at payout age</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PROPERTY -->
+<div class="card">
+  <div class="card-hdr"><span class="ico">🏠</span><h3>Property</h3></div>
+  <div class="card-body">
+    <div class="trow">
+      <span class="tl">Include property in net worth</span>
+      <label class="tog"><input type="checkbox" id="ck-prop" checked onchange="calc()"><div class="tt"></div><div class="th"></div></label>
+    </div>
+    <div class="field"><label>Primary Residence Value</label>
+      <div class="sc">
+        <div class="sc-top"><span class="sc-u">S$</span><span class="sc-v" id="v-propP">650,000</span></div>
+        <input type="range" id="s-propP" min="0" max="5000000" step="10000" value="650000" oninput="upd(this,'v-propP',true);calc()">
+        <div class="sc-mm"><span>0</span><span>S$5M</span></div>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="field"><label>Investment Property Value</label>
+        <div class="sc">
+          <div class="sc-top"><span class="sc-u">S$</span><span class="sc-v" id="v-propI">0</span></div>
+          <input type="range" id="s-propI" min="0" max="5000000" step="10000" value="0" oninput="upd(this,'v-propI',true);calc()">
+          <div class="sc-mm"><span>0</span><span>5M</span></div>
+        </div>
+      </div>
+      <div class="field"><label>Outstanding Mortgage</label>
+        <div class="sc">
+          <div class="sc-top"><span class="sc-u">S$</span><span class="sc-v" id="v-mort">150,000</span></div>
+          <input type="range" id="s-mort" min="0" max="2000000" step="5000" value="150000" oninput="upd(this,'v-mort',true);calc()">
+          <div class="sc-mm"><span>0</span><span>2M</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- INVESTMENTS -->
+<div class="card">
+  <div class="card-hdr"><span class="ico">📈</span><h3>Investments &amp; Cash</h3></div>
+  <div class="card-body">
+    <div class="g2">
+      <div class="field"><label>Stocks / ETFs / Unit Trusts</label>
+        <div class="sc">
+          <div class="sc-top"><span class="sc-u">S$</span><span class="sc-v" id="v-stocks">120,000</span></div>
+          <input type="range" id="s-stocks" min="0" max="2000000" step="5000" value="120000" oninput="upd(this,'v-stocks',true);calc()">
+          <div class="sc-mm"><span>0</span><span>2M</span></div>
+        </div>
+      </div>
+      <div class="field"><label>Bonds / Fixed Deposits</label>
+        <div class="sc">
+          <div class="sc-top"><span class="sc-u">S$</span><span class="sc-v" id="v-bonds">40,000</span></div>
+          <input type="range" id="s-bonds" min="0" max="1000000" step="5000" value="40000" oninput="upd(this,'v-bonds',true);calc()">
+          <div class="sc-mm"><span>0</span><span>1M</span></div>
+        </div>
+      </div>
+      <div class="field"><label>REITs</label>
+        <div class="sc">
+          <div class="sc-top"><span class="sc-u">S$</span><span class="sc-v" id="v-reits">30,000</span></div>
+          <input type="range" id="s-reits" min="0" max="1000000" step="5000" value="30000" oninput="upd(this,'v-reits',true);calc()">
+          <div class="sc-mm"><span>0</span><span>1M</span></div>
+        </div>
+      </div>
+      <div class="field"><label>Cash / Savings / SSB / T-Bills</label>
+        <div class="sc">
+          <div class="sc-top"><span class="sc-u">S$</span><span class="sc-v" id="v-cash">60,000</span></div>
+          <input type="range" id="s-cash" min="0" max="500000" step="5000" value="60000" oninput="upd(this,'v-cash',true);calc()">
+          <div class="sc-mm"><span>0</span><span>500k</span></div>
+        </div>
+      </div>
+      <div class="field"><label>Endowment / ILP / Insurance</label>
+        <div class="sc">
+          <div class="sc-top"><span class="sc-u">S$</span><span class="sc-v" id="v-endow">25,000</span></div>
+          <input type="range" id="s-endow" min="0" max="500000" step="5000" value="25000" oninput="upd(this,'v-endow',true);calc()">
+          <div class="sc-mm"><span>0</span><span>500k</span></div>
+        </div>
+      </div>
+      <div class="field"><label>Crypto / Collectibles / Other</label>
+        <div class="sc">
+          <div class="sc-top"><span class="sc-u">S$</span><span class="sc-v" id="v-other">0</span></div>
+          <input type="range" id="s-other" min="0" max="500000" step="5000" value="0" oninput="upd(this,'v-other',true);calc()">
+          <div class="sc-mm"><span>0</span><span>500k</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="field"><label>Other Debts (car, personal, credit cards)</label>
+      <div class="sc">
+        <div class="sc-top"><span class="sc-u">S$</span><span class="sc-v" id="v-debts">15,000</span></div>
+        <input type="range" id="s-debts" min="0" max="500000" step="1000" value="15000" oninput="upd(this,'v-debts',true);calc()">
+        <div class="sc-mm"><span>0</span><span>500k</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ACTIVE INCOME -->
+<div class="card">
+  <div class="card-hdr"><span class="ico">💼</span><h3>Active Income (Current)</h3></div>
+  <div class="card-body">
+    <div class="g2">
+      <div class="field"><label>Monthly Take-Home Pay</label>
+        <div class="sc">
+          <div class="sc-top"><span class="sc-u">S$</span><span class="sc-v" id="v-sal">7,000</span></div>
+          <input type="range" id="s-sal" min="0" max="50000" step="500" value="7000" oninput="upd(this,'v-sal',true);calc()">
+          <div class="sc-mm"><span>0</span><span>50k</span></div>
+        </div>
+      </div>
+      <div class="field"><label>Side / Freelance (monthly)</label>
+        <div class="sc">
+          <div class="sc-top"><span class="sc-u">S$</span><span class="sc-v" id="v-side">500</span></div>
+          <input type="range" id="s-side" min="0" max="20000" step="100" value="500" oninput="upd(this,'v-side',true);calc()">
+          <div class="sc-mm"><span>0</span><span>20k</span></div>
+        </div>
+      </div>
+      <div class="field"><label>Annual Bonus (average)</label>
+        <div class="sc">
+          <div class="sc-top"><span class="sc-u">S$</span><span class="sc-v" id="v-bonus">14,000</span></div>
+          <input type="range" id="s-bonus" min="0" max="200000" step="1000" value="14000" oninput="upd(this,'v-bonus',true);calc()">
+          <div class="sc-mm"><span>0</span><span>200k</span></div>
+        </div>
+      </div>
+      <div class="field"><label>Monthly Savings Rate</label>
+        <div class="sc">
+          <div class="sc-top"><span class="sc-v" id="v-savR">30</span><span class="sc-u">%</span></div>
+          <input type="range" id="s-savR" min="0" max="80" step="1" value="30" oninput="upd(this,'v-savR');calc()">
+          <div class="sc-mm"><span>0%</span><span>80%</span></div>
+        </div>
+        <div class="hint">% of (salary + side income) saved</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PASSIVE INCOME NOW -->
+<div class="card">
+  <div class="card-hdr"><span class="ico">🏘️</span><h3>Current Passive Income</h3></div>
+  <div class="card-body">
+    <div class="g2">
+      <div class="field"><label>Rental Income (net/mo)</label>
+        <div class="sc">
+          <div class="sc-top"><span class="sc-u">S$</span><span class="sc-v" id="v-rental">0</span></div>
+          <input type="range" id="s-rental" min="0" max="20000" step="100" value="0" oninput="upd(this,'v-rental',true);calc()">
+          <div class="sc-mm"><span>0</span><span>20k</span></div>
+        </div>
+      </div>
+      <div class="field"><label>Dividends (monthly avg)</label>
+        <div class="sc">
+          <div class="sc-top"><span class="sc-u">S$</span><span class="sc-v" id="v-divid">300</span></div>
+          <input type="range" id="s-divid" min="0" max="20000" step="100" value="300" oninput="upd(this,'v-divid',true);calc()">
+          <div class="sc-mm"><span>0</span><span>20k</span></div>
+        </div>
+      </div>
+      <div class="field"><label>Interest / FD / SSB (mo)</label>
+        <div class="sc">
+          <div class="sc-top"><span class="sc-u">S$</span><span class="sc-v" id="v-intr">150</span></div>
+          <input type="range" id="s-intr" min="0" max="10000" step="50" value="150" oninput="upd(this,'v-intr',true);calc()">
+          <div class="sc-mm"><span>0</span><span>10k</span></div>
+        </div>
+      </div>
+      <div class="field"><label>Other Passive (monthly)</label>
+        <div class="sc">
+          <div class="sc-top"><span class="sc-u">S$</span><span class="sc-v" id="v-pasvn">0</span></div>
+          <input type="range" id="s-pasvn" min="0" max="10000" step="50" value="0" oninput="upd(this,'v-pasvn',true);calc()">
+          <div class="sc-mm"><span>0</span><span>10k</span></div>
+        </div>
+        <div class="hint">Royalties, digital products, etc.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RETIREMENT INCOME SOURCES -->
+<div class="card">
+  <div class="card-hdr"><span class="ico">🌅</span><h3>Expected Retirement Income Sources</h3></div>
+  <div class="card-body">
+    <div class="g2">
+      <div class="field"><label>Rental in Retirement (mo)</label>
+        <div class="sc">
+          <div class="sc-top"><span class="sc-u">S$</span><span class="sc-v" id="v-rRental">0</span></div>
+          <input type="range" id="s-rRental" min="0" max="20000" step="100" value="0" oninput="upd(this,'v-rRental',true);calc()">
+          <div class="sc-mm"><span>0</span><span>20k</span></div>
+        </div>
+      </div>
+      <div class="field"><label>Dividends in Retirement (mo)</label>
+        <div class="sc">
+          <div class="sc-top"><span class="sc-u">S$</span><span class="sc-v" id="v-rDivid">800</span></div>
+          <input type="range" id="s-rDivid" min="0" max="20000" step="100" value="800" oninput="upd(this,'v-rDivid',true);calc()">
+          <div class="sc-mm"><span>0</span><span>20k</span></div>
+        </div>
+      </div>
+      <div class="field"><label>Part-time / Consulting (mo)</label>
+        <div class="sc">
+          <div class="sc-top"><span class="sc-u">S$</span><span class="sc-v" id="v-rActive">500</span></div>
+          <input type="range" id="s-rActive" min="0" max="10000" step="100" value="500" oninput="upd(this,'v-rActive',true);calc()">
+          <div class="sc-mm"><span>0</span><span>10k</span></div>
+        </div>
+      </div>
+      <div class="field"><label>Other Passive in Retirement</label>
+        <div class="sc">
+          <div class="sc-top"><span class="sc-u">S$</span><span class="sc-v" id="v-rOther">0</span></div>
+          <input type="range" id="s-rOther" min="0" max="10000" step="100" value="0" oninput="upd(this,'v-rOther',true);calc()">
+          <div class="sc-mm"><span>0</span><span>10k</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RATES -->
+<div class="card">
+  <div class="card-hdr"><span class="ico">⚙️</span><h3>Rates &amp; Assumptions</h3></div>
+  <div class="card-body">
+    <div class="g2">
+      <div class="field"><label>General Inflation (p.a.)</label>
+        <div class="sc">
+          <div class="sc-top"><span class="sc-v" id="v-inf">2.5</span><span class="sc-u">%</span></div>
+          <input type="range" id="s-inf" min="0" max="8" step="0.1" value="2.5" oninput="upd(this,'v-inf',false,1);calc()">
+          <div class="sc-mm"><span>0%</span><span>8%</span></div>
+        </div>
+        <div class="hint">SG avg ~2–3% historically</div>
+      </div>
+      <div class="field"><label>Healthcare Inflation (p.a.)</label>
+        <div class="sc">
+          <div class="sc-top"><span class="sc-v" id="v-hinf">4.0</span><span class="sc-u">%</span></div>
+          <input type="range" id="s-hinf" min="0" max="10" step="0.1" value="4.0" oninput="upd(this,'v-hinf',false,1);calc()">
+          <div class="sc-mm"><span>0%</span><span>10%</span></div>
+        </div>
+      </div>
+      <div class="field"><label>Portfolio Return Pre-Retire</label>
+        <div class="sc">
+          <div class="sc-top"><span class="sc-v" id="v-iret">6.0</span><span class="sc-u">%</span></div>
+          <input type="range" id="s-iret" min="0" max="15" step="0.1" value="6.0" oninput="upd(this,'v-iret',false,1);calc()">
+          <div class="sc-mm"><span>0%</span><span>15%</span></div>
+        </div>
+      </div>
+      <div class="field"><label>Portfolio Return In-Retirement</label>
+        <div class="sc">
+          <div class="sc-top"><span class="sc-v" id="v-rret">4.0</span><span class="sc-u">%</span></div>
+          <input type="range" id="s-rret" min="0" max="12" step="0.1" value="4.0" oninput="upd(this,'v-rret',false,1);calc()">
+          <div class="sc-mm"><span>0%</span><span>12%</span></div>
+        </div>
+      </div>
+      <div class="field"><label>Property Appreciation (p.a.)</label>
+        <div class="sc">
+          <div class="sc-top"><span class="sc-v" id="v-pgrow">2.0</span><span class="sc-u">%</span></div>
+          <input type="range" id="s-pgrow" min="0" max="8" step="0.1" value="2.0" oninput="upd(this,'v-pgrow',false,1);calc()">
+          <div class="sc-mm"><span>0%</span><span>8%</span></div>
+        </div>
+      </div>
+      <div class="field"><label>Salary Growth (p.a.)</label>
+        <div class="sc">
+          <div class="sc-top"><span class="sc-v" id="v-sgrow">3.0</span><span class="sc-u">%</span></div>
+          <input type="range" id="s-sgrow" min="0" max="10" step="0.1" value="3.0" oninput="upd(this,'v-sgrow',false,1);calc()">
+          <div class="sc-mm"><span>0%</span><span>10%</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="field" style="margin-top:8px"><label>Withdrawal Strategy</label>
+      <select class="fsel" id="sel-strat" onchange="calc()">
+        <option value="4pct">4% Safe Withdrawal Rate</option>
+        <option value="bucket">Bucket Strategy (3-bucket)</option>
+        <option value="dynamic">Dynamic Withdrawal (income floor)</option>
+      </select>
+    </div>
+    <div class="trow" style="margin-top:12px">
+      <span class="tl">Include estate planning buffer (+10% to target)</span>
+      <label class="tog"><input type="checkbox" id="ck-estate" onchange="calc()"><div class="tt"></div><div class="th"></div></label>
+    </div>
+  </div>
+</div>
+
+<div style="text-align:center;padding:12px 0">
+  <div onclick="showPage('results',document.querySelectorAll('.ptab')[1])" style="display:inline-block;background:var(--gold);color:#0f1318;font-weight:800;font-size:14px;padding:14px 36px;border-radius:50px;cursor:pointer;letter-spacing:.5px">View Results &amp; Charts →</div>
+</div>
+
+</div></div><!-- /ibody /pg-input -->
+
+
+<!-- ═══════ RESULTS PAGE ═══════ -->
+<div class="page" id="pg-results"><div class="rbody">
+
+  <div class="alts" id="r-alerts"></div>
+
+  <div class="sg">
+    <div class="sc2 gold"><div class="sc-ico">🎯</div><div class="sc-lbl">Target Retire Sum</div><div class="sc-val" id="r-target">—</div><div class="sc-sub">Inflation-adjusted</div></div>
+    <div class="sc2 grn"><div class="sc-ico">💰</div><div class="sc-lbl">Net Worth at Retire</div><div class="sc-val" id="r-nwret">—</div><div class="sc-sub">All assets projected</div></div>
+    <div class="sc2 red" id="r-gapcard"><div class="sc-ico" id="r-gapico">📉</div><div class="sc-lbl">Surplus / Shortfall</div><div class="sc-val" id="r-gap">—</div><div class="sc-sub" id="r-gapsub">—</div></div>
+    <div class="sc2 teal"><div class="sc-ico">🏦</div><div class="sc-lbl">Net Worth Today</div><div class="sc-val" id="r-nwnow">—</div><div class="sc-sub">Current snapshot</div></div>
+    <div class="sc2 blu"><div class="sc-ico">📅</div><div class="sc-lbl">Years to Retire</div><div class="sc-val" id="r-ytr">—</div><div class="sc-sub">Accumulation phase</div></div>
+    <div class="sc2 purp"><div class="sc-ico">⏳</div><div class="sc-lbl">Retirement Duration</div><div class="sc-val" id="r-dur">—</div><div class="sc-sub">Drawdown phase</div></div>
+  </div>
+
+  <div class="ixc">
+    <div class="ix-top">
+      <div><div class="ix-title">Retirement Readiness Index</div><div class="ix-sub">Composite score: Asset Coverage · Income Security · Savings Rate · Time · Diversification</div></div>
+      <div class="ix-score"><span class="sn" id="r-snum">—</span><span class="sd">/100</span><div class="sg2" id="r-sgrade">—</div></div>
+    </div>
+    <div class="mtr"><div class="mf" id="r-mf" style="width:0"></div></div>
+    <div class="mmarks"><span>0 Critical</span><span>25 Poor</span><span>50 Fair</span><span>70 Good</span><span>100 Excellent</span></div>
+    <div class="sbars">
+      <div class="sb"><div class="sb-l">Asset Coverage</div><div class="sb-t"><div class="sb-f" id="sb-a"></div></div><div class="sb-n" id="sbn-a" style="color:var(--blu)">0</div></div>
+      <div class="sb"><div class="sb-l">Income Security</div><div class="sb-t"><div class="sb-f" id="sb-i"></div></div><div class="sb-n" id="sbn-i" style="color:var(--grn)">0</div></div>
+      <div class="sb"><div class="sb-l">Savings Rate</div><div class="sb-t"><div class="sb-f" id="sb-s"></div></div><div class="sb-n" id="sbn-s" style="color:var(--gold)">0</div></div>
+      <div class="sb"><div class="sb-l">Time Horizon</div><div class="sb-t"><div class="sb-f" id="sb-t"></div></div><div class="sb-n" id="sbn-t" style="color:var(--purp)">0</div></div>
+      <div class="sb"><div class="sb-l">Diversification</div><div class="sb-t"><div class="sb-f" id="sb-d"></div></div><div class="sb-n" id="sbn-d" style="color:var(--teal)">0</div></div>
+    </div>
+  </div>
+
+  <div class="inc">
+    <div class="cc-t">Monthly Retirement Income Breakdown</div>
+    <div class="cc-s" style="margin-bottom:10px">Expected sources at retirement (today's dollars)</div>
+    <div id="r-incrows"></div>
+    <div class="itot">
+      <span class="il2">Total Income vs Monthly Need</span>
+      <span class="iv" id="r-inctot">—</span>
+    </div>
+  </div>
+
+  <div class="cg">
+    <div class="cc">
+      <div class="cc-t">Wealth Accumulation</div>
+      <div class="cc-s">Net worth trajectory to retirement</div>
+      <canvas id="ch-grow" height="200"></canvas>
+    </div>
+    <div class="cc">
+      <div class="cc-t">Asset Allocation Today</div>
+      <div class="cc-s">Current portfolio composition</div>
+      <div class="dw"><canvas id="ch-asset" height="190"></canvas>
+        <div class="dc"><div class="dc-n" id="dc-assetN">—</div><div class="dc-l">Total Assets</div></div>
+      </div>
+      <div class="leg" id="leg-asset"></div>
+    </div>
+    <div class="cc">
+      <div class="cc-t">Retirement Income Mix</div>
+      <div class="cc-s">Monthly income sources at retirement</div>
+      <div class="dw"><canvas id="ch-inc" height="190"></canvas>
+        <div class="dc"><div class="dc-n" id="dc-incN">—</div><div class="dc-l">per month</div></div>
+      </div>
+      <div class="leg" id="leg-inc"></div>
+    </div>
+    <div class="cc">
+      <div class="cc-t">Portfolio Drawdown</div>
+      <div class="cc-s">Investable balance through retirement</div>
+      <canvas id="ch-draw" height="200"></canvas>
+    </div>
+  </div>
+
+  <div class="pc">
+    <div class="cc-t" style="margin-bottom:3px">Year-by-Year Projection</div>
+    <div class="cc-s" style="margin-bottom:12px">Key financial milestones</div>
+    <div class="tw"><table>
+      <thead><tr>
+        <th>Age / Year</th><th>Liquid Assets</th><th>CPF Total</th>
+        <th>Net Worth</th><th>Annual Savings</th><th>Passive /mo</th><th>Event</th>
+      </tr></thead>
+      <tbody id="r-tbl"></tbody>
+    </table></div>
+  </div>
+
+  <div class="foot">RetireReady SG · Educational only · Not financial advice · All figures S$ · Works offline as index.html on GitHub Pages</div>
+</div></div><!-- /rbody /pg-results -->
+
+<script>
+// ── PAGE NAV ─────────────────────────────────────────────────────
+function showPage(id,el){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('on')});
+  document.querySelectorAll('.ptab').forEach(function(t){t.classList.remove('on')});
+  document.getElementById('pg-'+id).classList.add('on');
+  if(el) el.classList.add('on');
+  if(id==='results'){updateResults();renderCharts()}
+}
+
+// ── SLIDER UPDATE ────────────────────────────────────────────────
+// upd(el, displayId, commaSep=false, decimals=0)
+function upd(el,vid,comma,dec){
+  var v=parseFloat(el.value);
+  var mn=parseFloat(el.min),mx=parseFloat(el.max);
+  var pct=((v-mn)/(mx-mn)*100).toFixed(2)+'%';
+  el.style.setProperty('--pct',pct);
+  var txt;
+  if(dec) txt=v.toFixed(dec);
+  else if(comma) txt=Math.round(v).toLocaleString('en-SG');
+  else txt=Math.round(v).toString();
+  document.getElementById(vid).textContent=txt;
+}
+
+// Init all sliders gradient on load
+function initAll(){
+  document.querySelectorAll('.sc input[type=range]').forEach(function(el){
+    var v=parseFloat(el.value),mn=parseFloat(el.min),mx=parseFloat(el.max);
+    el.style.setProperty('--pct',((v-mn)/(mx-mn)*100).toFixed(2)+'%');
+  });
+}
+
+// ── GETTERS ──────────────────────────────────────────────────────
+var _=function(id){return document.getElementById(id)};
+function g(id){return parseFloat(_(id).value)||0}
+function gc(id){return _(id).checked}
+function fS(n){return 'S$'+Math.abs(Math.round(n)).toLocaleString('en-SG')}
+function fK(n){var a=Math.abs(n);if(a>=1000000)return'S$'+(a/1e6).toFixed(2)+'M';if(a>=1000)return'S$'+(a/1000).toFixed(0)+'K';return'S$'+Math.round(a)}
+function clamp(v,a,b){return Math.min(b,Math.max(a,v))}
+function sc(s){if(s>=80)return'var(--grn)';if(s>=60)return'var(--gold)';if(s>=40)return'#f0a500';return'var(--red)'}
+function sg(s){if(s>=85)return'EXCELLENT';if(s>=70)return'GOOD';if(s>=55)return'FAIR';if(s>=35)return'POOR';return'CRITICAL'}
+
+// ── LAST RESULT CACHE ────────────────────────────────────────────
+var R={};
+
+// ── MAIN CALC ────────────────────────────────────────────────────
+function calc(){
+  // Profile
+  var curAge=g('s-curAge'), retAge=g('s-retAge'), cpfAge=g('s-cpfAge'), lifeExp=g('s-lifeExp');
+  var ytr=Math.max(1,retAge-curAge), dur=Math.max(1,lifeExp-retAge);
+
+  // Expenses
+  var eBasic=g('s-eBasic'),eHealth=g('s-eHealth'),eLeisure=g('s-eLeisure'),eFamily=g('s-eFamily'),eEmerg=g('s-eEmerg');
+  var eMed=gc('ck-med')?200:0;
+  var expMo=eBasic+eHealth+eLeisure+eFamily+eEmerg+eMed;
+
+  // Rates
+  var inf=g('s-inf')/100, hinf=g('s-hinf')/100;
+  var iret=g('s-iret')/100, rret=g('s-rret')/100;
+  var pgrow=g('s-pgrow')/100, sgrow=g('s-sgrow')/100;
+
+  // CPF
+  var cpfOA=g('s-cpfOA'),cpfSA=g('s-cpfSA'),cpfMA=g('s-cpfMA'),cpfLife=g('s-cpfLife');
+
+  // Property
+  var propP=g('s-propP'),propI=g('s-propI'),mort=g('s-mort');
+  var inclProp=gc('ck-prop');
+
+  // Investments
+  var stocks=g('s-stocks'),bonds=g('s-bonds'),reits=g('s-reits'),cash=g('s-cash'),endow=g('s-endow'),other=g('s-other'),debts=g('s-debts');
+
+  // Active income
+  var sal=g('s-sal'),side=g('s-side'),bonus=g('s-bonus'),savR=g('s-savR')/100;
+  var annSav=(sal+side)*savR*12+bonus;
+
+  // Passive now
+  var rental=g('s-rental'),divid=g('s-divid'),intr=g('s-intr'),pasvn=g('s-pasvn');
+  var annPassNow=(rental+divid+intr+pasvn)*12;
+
+  // Retirement income
+  var rRental=g('s-rRental'),rDivid=g('s-rDivid'),rActive=g('s-rActive'),rOther=g('s-rOther');
+
+  // Strategy
+  var strat=_('sel-strat').value;
+  var ebuf=gc('ck-estate')?1.1:1.0;
+
+  // ── NET WORTH TODAY ──────────────────────────────────────────
+  var liqNow=stocks+bonds+reits+cash+endow+other;
+  var cpfNow=cpfOA+cpfSA+cpfMA;
+  var propNow=inclProp?(propP+propI-mort):0;
+  var nwNow=liqNow+cpfNow+propNow-debts;
+
+  // ── INFLATION-ADJUSTED EXPENSES AT RETIRE ───────────────────
+  var iF=Math.pow(1+inf,ytr), hF=Math.pow(1+hinf,ytr);
+  var adjExpMo=(eBasic+eLeisure+eFamily+eEmerg)*iF+(eHealth+eMed)*hF;
+  var adjExpAnn=adjExpMo*12;
+
+  // ── TARGET SUM ───────────────────────────────────────────────
+  var realRet=rret-inf;
+  var target;
+  if(strat==='4pct'){
+    target=adjExpAnn*25*ebuf;
+  } else if(strat==='bucket'){
+    var pvR=realRet>0.001?adjExpAnn*(1-Math.pow(1+realRet,-(Math.max(1,dur-10))))/realRet:adjExpAnn*Math.max(1,dur-10);
+    target=(adjExpAnn*2+adjExpAnn*8*0.9+pvR)*ebuf;
+  } else {
+    var floor=adjExpAnn*0.6;
+    var pvF=realRet>0.001?floor*(1-Math.pow(1+realRet,-dur))/realRet:floor*dur;
+    target=pvF*1.4*ebuf;
+  }
+
+  // ── LIQUID AT RETIRE ────────────────────────────────────────
+  var liqRet=liqNow*Math.pow(1+iret,ytr);
+  liqRet+=iret>0.0001?annSav*(Math.pow(1+iret,ytr)-1)/iret:annSav*ytr;
+
+  // ── CPF AT RETIRE ───────────────────────────────────────────
+  var cpfOAr=cpfOA*Math.pow(1+0.025,ytr);
+  var cpfSAr=cpfSA*Math.pow(1+0.04,ytr);
+  var cpfMAr=cpfMA*Math.pow(1+0.04,ytr);
+  var cpfRet=cpfOAr+cpfSAr+cpfMAr;
+
+  // ── PROPERTY AT RETIRE ──────────────────────────────────────
+  var propRet=inclProp?(propP+propI)*Math.pow(1+pgrow,ytr)-Math.max(0,mort-annSav*0.3*ytr):0;
+
+  // ── PROJECTED NW AT RETIRE ──────────────────────────────────
+  var nwRet=liqRet+cpfRet+propRet;
+
+  // ── INVESTABLE (liquid + half OA) ───────────────────────────
+  var investable=liqRet+cpfOAr*0.5;
+  var gap=investable-target;
+
+  // ── RETIREMENT INCOME ────────────────────────────────────────
+  var cpfLifeAdj=(cpfAge<=retAge)?cpfLife*Math.pow(1+inf,ytr):0;
+  var totalRetInc=cpfLifeAdj+rRental+rDivid+rActive+rOther;
+  var covPct=adjExpMo>0?totalRetInc/adjExpMo*100:0;
+
+  // ── SUB-SCORES ───────────────────────────────────────────────
+  var sA=clamp(target>0?investable/target*100:0,0,100);
+  var sI=clamp(covPct,0,100);
+  var sS=clamp(savR/0.30*100,0,100);
+  var sT=clamp(ytr/30*100,0,100);
+  var nTypes=[liqNow>0,cpfNow>0,(propP+propI)>0,rental>0,divid>0].filter(Boolean).length;
+  var sD=clamp(nTypes*20,0,100);
+  var score=Math.round(sA*0.30+sI*0.25+sS*0.20+sT*0.15+sD*0.10);
+
+  // ── STORE ────────────────────────────────────────────────────
+  R={curAge,retAge,cpfAge,lifeExp,ytr,dur,
+     expMo,adjExpMo,adjExpAnn,target,nwNow,nwRet,gap,investable,
+     liqNow,cpfNow,propNow,liqRet,cpfRet,propRet,
+     cpfOA,cpfSA,cpfMA,cpfOAr,cpfSAr,cpfMAr,
+     stocks,bonds,reits,cash,endow,other,debts,propP,propI,mort,inclProp,
+     sal,side,bonus,savR,annSav,annPassNow,
+     rental,divid,intr,pasvn,
+     rRental,rDivid,rActive,rOther,cpfLife,cpfLifeAdj,totalRetInc,covPct,
+     iret,rret,inf,hinf,pgrow,sgrow,
+     sA,sI,sS,sT,sD,score};
+
+  // ── UPDATE HEADER ────────────────────────────────────────────
+  _('hscore').textContent=score;
+  _('hscore').style.color=sc(score);
+  _('hgrade').textContent=sg(score);
+  _('hgrade').style.color=sc(score);
+
+  // Update results page if visible
+  if(_('pg-results').classList.contains('on')) updateResults();
+}
+
+// ── RESULTS UPDATE ───────────────────────────────────────────────
+function updateResults(){
+  var c=R;
+  if(!c.target) return;
+
+  _('r-target').textContent=fK(c.target);
+  _('r-nwret').textContent=fK(c.nwRet);
+  _('r-nwnow').textContent=fK(c.nwNow);
+  _('r-ytr').textContent=c.ytr+' yrs';
+  _('r-dur').textContent=c.dur+' yrs';
+
+  var gapPos=c.gap>=0;
+  _('r-gap').textContent=(gapPos?'+':'-')+fK(c.gap);
+  _('r-gap').style.color=gapPos?'var(--grn)':'var(--red)';
+  _('r-gapsub').textContent=gapPos?'Projected surplus':'Shortfall — action needed';
+  _('r-gapcard').className='sc2 '+(gapPos?'grn':'red');
+
+  // Score
+  _('r-snum').textContent=c.score;
+  _('r-snum').style.color=sc(c.score);
+  _('r-sgrade').textContent=sg(c.score);
+  _('r-sgrade').style.color=sc(c.score);
+  _('r-mf').style.width=c.score+'%';
+  _('r-mf').style.background=sc(c.score);
+
+  var bars=[['sb-a','sbn-a',c.sA,'var(--blu)'],['sb-i','sbn-i',c.sI,'var(--grn)'],
+            ['sb-s','sbn-s',c.sS,'var(--gold)'],['sb-t','sbn-t',c.sT,'var(--purp)'],
+            ['sb-d','sbn-d',c.sD,'var(--teal)']];
+  bars.forEach(function(b){
+    _(b[0]).style.width=clamp(b[2],0,100)+'%';_(b[0]).style.background=b[3];
+    _(b[1]).textContent=Math.round(b[2]);_(b[1]).style.color=b[3];
+  });
+
+  // Income rows
+  var items=[
+    {n:'CPF LIFE',d:'From age '+c.cpfAge,a:c.cpfLifeAdj,col:'var(--blu)'},
+    {n:'Rental',d:'Net property income',a:c.rRental,col:'var(--grn)'},
+    {n:'Dividends',d:'Stocks, REITs, ETFs',a:c.rDivid,col:'var(--gold)'},
+    {n:'Part-time/Active',d:'Consulting, gig',a:c.rActive,col:'var(--purp)'},
+    {n:'Other Passive',d:'Royalties, etc.',a:c.rOther,col:'var(--teal)'}
+  ].filter(function(x){return x.a>0});
+  var totInc=items.reduce(function(s,x){return s+x.a},0);
+  _('r-incrows').innerHTML=items.map(function(x){
+    return '<div class="irow"><div class="il"><div class="idot" style="background:'+x.col+'"></div>'+
+      '<div><div class="iname">'+x.n+'</div><div class="idesc">'+x.d+'</div></div></div>'+
+      '<div class="ir"><div class="iamt" style="color:'+x.col+'">'+fS(x.a)+'/mo</div>'+
+      '<div class="ipct">'+(totInc>0?Math.round(x.a/totInc*100)+'%':'')+'</div></div></div>';
+  }).join('');
+  _('r-inctot').textContent=fS(totInc)+'/mo vs '+fS(c.adjExpMo)+' needed';
+  _('r-inctot').style.color=totInc>=c.adjExpMo?'var(--grn)':'var(--red)';
+
+  // Alerts
+  var als=[];
+  if(c.gap<0) als.push({t:'bad',i:'🚨',h:'Shortfall: '+fK(Math.abs(c.gap)),m:'Your investable assets fall short of the target. Increase savings rate, delay retirement, or boost returns.'});
+  if(c.covPct<50) als.push({t:'bad',i:'⚠️',h:'Low Passive Income: '+Math.round(c.covPct)+'% of expenses covered',m:'Consider adding rental, dividend, or REIT income sources to secure retirement cash flow.'});
+  if(c.savR<0.15) als.push({t:'warn',i:'💡',h:'Low Savings Rate ('+Math.round(c.savR*100)+'%)',m:'Aim for 20–30%. Small increases compound significantly over a long accumulation horizon.'});
+  if(c.retAge<c.cpfAge) als.push({t:'warn',i:'🏛️',h:'CPF LIFE Gap: '+(c.cpfAge-c.retAge)+' years before payout',m:'Bridge income needed from age '+c.retAge+' until CPF LIFE starts at '+c.cpfAge+'.'});
+  if(c.sD<40) als.push({t:'warn',i:'📦',h:'Low Asset Diversification',m:'Spread wealth across property, equities, CPF and multiple passive income streams.'});
+  if(c.gap>=0&&c.covPct>=60) als.push({t:'good',i:'✅',h:'On Track! Surplus: '+fK(c.gap),m:Math.round(c.covPct)+'% of expenses covered by passive income. Keep compounding and review annually.'});
+  _('r-alerts').innerHTML=als.map(function(a){
+    return '<div class="alt '+a.t+'"><div class="ai">'+a.i+'</div><div><strong>'+a.h+'</strong><span>'+a.m+'</span></div></div>';
+  }).join('');
+
+  // Table
+  var ages=new Set([c.curAge,c.retAge,c.cpfAge,c.lifeExp]);
+  for(var a=c.curAge;a<=c.lifeExp;a+=5) ages.add(a);
+  var sorted=[...ages].filter(function(a){return a>=c.curAge&&a<=c.lifeExp}).sort(function(a,b){return a-b});
+  var rows='';
+  sorted.forEach(function(age){
+    var i=age-c.curAge, yi=Math.min(i,c.ytr);
+    var liq=c.liqNow*Math.pow(1+c.iret,yi);
+    liq+=c.iret>0.0001?c.annSav*(Math.pow(1+c.iret,yi)-1)/c.iret:c.annSav*yi;
+    var cpf=(c.cpfOA*Math.pow(1+0.025,yi))+(c.cpfSA*Math.pow(1+0.04,yi))+(c.cpfMA*Math.pow(1+0.04,yi));
+    var prop=c.inclProp?(c.propP+c.propI)*Math.pow(1+c.pgrow,yi)-Math.max(0,c.mort-c.annSav*0.3*yi):0;
+    var nw=liq+cpf+prop;
+    var savA=age<c.retAge?fS(c.annSav*Math.pow(1+c.sgrow,yi)):'—';
+    var passM=age<c.retAge?(c.rental+c.divid+c.intr+c.pasvn):c.totalRetInc;
+    var notes=[]; if(age===c.retAge)notes.push('🎯 Retire'); if(age===c.cpfAge)notes.push('🏛️ CPF LIFE'); if(age===c.lifeExp)notes.push('📅 Life exp');
+    var cls=age===c.retAge?'hl':notes.length?'mile':'';
+    rows+='<tr class="'+cls+'"><td>'+age+' ('+(2025+i)+')</td><td>'+fK(liq)+'</td><td>'+fK(cpf)+'</td><td>'+fK(nw)+'</td><td>'+savA+'</td><td>'+fS(passM)+'/mo</td><td>'+notes.join(' ')+'</td></tr>';
+  });
+  _('r-tbl').innerHTML=rows;
+}
+
+// ── CHARTS ───────────────────────────────────────────────────────
+var CHS={};
+var CLRS=['#5b9cf6','#35d07a','#e8c547','#a78bfa','#2dd4bf','#f05454','#fb923c','#f472b6'];
+
+function mkLine(id,labels,datasets){
+  if(CHS[id]){CHS[id].destroy();delete CHS[id]}
+  var ctx=_(id);if(!ctx||!window.Chart)return;
+  CHS[id]=new Chart(ctx,{
+    type:'line',
+    data:{labels:labels,datasets:datasets.map(function(d){return Object.assign({pointRadius:0,pointHoverRadius:5,tension:0.4,borderWidth:2.5},d)})},
+    options:{
+      responsive:true,maintainAspectRatio:true,animation:{duration:300},
+      plugins:{legend:{labels:{color:'#9aa3b0',font:{size:10},boxWidth:10,padding:10}}},
+      scales:{
+        x:{ticks:{color:'#5c6880',font:{size:9},maxTicksLimit:8},grid:{color:'rgba(44,54,72,.5)'}},
+        y:{ticks:{color:'#5c6880',font:{size:9},callback:function(v){return v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?(v/1e3).toFixed(0)+'K':v}},grid:{color:'rgba(44,54,72,.5)'}}
+      },
+      interaction:{mode:'index',intersect:false}
+    }
+  });
+}
+
+function mkDonut(id,lbls,vals,clrs,centerEl,legEl){
+  if(CHS[id]){CHS[id].destroy();delete CHS[id]}
+  var ctx=_(id);if(!ctx||!window.Chart)return;
+  // filter zeros
+  var fv=[],fl=[],fc=[];
+  vals.forEach(function(v,i){if(v>0){fv.push(v);fl.push(lbls[i]);fc.push(clrs[i])}});
+  if(!fv.length)return;
+  CHS[id]=new Chart(ctx,{
+    type:'doughnut',
+    data:{labels:fl,datasets:[{data:fv,backgroundColor:fc,borderColor:'#0f1318',borderWidth:3,hoverBorderWidth:4,hoverOffset:6}]},
+    options:{
+      responsive:true,maintainAspectRatio:true,cutout:'66%',animation:{duration:300},
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{label:function(ctx){return ' '+ctx.label+': '+fS(ctx.parsed)}}}
+      }
+    }
+  });
+  var tot=fv.reduce(function(s,v){return s+v},0);
+  if(centerEl) _(centerEl).textContent=fK(tot);
+  if(legEl) _(legEl).innerHTML=fl.map(function(l,i){
+    return '<div class="li"><div class="ld" style="background:'+fc[i]+'"></div>'+l+'</div>';
+  }).join('');
+}
+
+function renderCharts(){
+  var c=R;
+  if(!c.target||!window.Chart)return;
+
+  // Growth chart
+  var gl=[],gnw=[],gtgt=[];
+  for(var i=0;i<=c.ytr;i++){
+    var liq=c.liqNow*Math.pow(1+c.iret,i);
+    liq+=c.iret>0.0001?c.annSav*(Math.pow(1+c.iret,i)-1)/c.iret:c.annSav*i;
+    var cpf=(c.cpfOA*Math.pow(1+0.025,i))+(c.cpfSA*Math.pow(1+0.04,i))+(c.cpfMA*Math.pow(1+0.04,i));
+    var prop=c.inclProp?(c.propP+c.propI)*Math.pow(1+c.pgrow,i)-Math.max(0,c.mort-c.annSav*0.3*i):0;
+    gl.push('Age '+(c.curAge+i));
+    gnw.push(Math.round(liq+cpf+prop));
+    gtgt.push(Math.round(c.target));
+  }
+  mkLine('ch-grow',gl,[
+    {label:'Net Worth',data:gnw,borderColor:'#e8c547',backgroundColor:'rgba(232,197,71,0.07)',fill:true},
+    {label:'Target',data:gtgt,borderColor:'#f05454',borderDash:[5,4],backgroundColor:'transparent'}
+  ]);
+
+  // Asset donut
+  mkDonut('ch-asset',
+    ['Stocks/ETFs','Bonds/FD','REITs','Cash/SSB','Endowment','Other','CPF','Property'],
+    [c.stocks,c.bonds,c.reits,c.cash,c.endow,c.other,c.cpfOA+c.cpfSA,c.inclProp?Math.max(0,c.propP+c.propI-c.mort):0],
+    CLRS,'dc-assetN','leg-asset'
+  );
+
+  // Income donut
+  var gapInc=Math.max(0,c.adjExpMo-c.totalRetInc);
+  mkDonut('ch-inc',
+    ['CPF LIFE','Rental','Dividends','Part-time','Other','Draw from Portfolio'],
+    [c.cpfLifeAdj,c.rRental,c.rDivid,c.rActive,c.rOther,gapInc],
+    CLRS,'dc-incN','leg-inc'
+  );
+
+  // Drawdown chart
+  var dl=[],db=[];
+  var bal=c.investable;
+  for(var j=0;j<=c.dur;j++){
+    dl.push('Age '+(c.retAge+j));
+    db.push(Math.round(Math.max(0,bal)));
+    var draw=Math.max(0,c.adjExpAnn*Math.pow(1+c.inf,j)-c.totalRetInc*12*Math.pow(1+c.inf*0.5,j));
+    bal=bal*(1+c.rret)-draw;
+  }
+  mkLine('ch-draw',dl,[
+    {label:'Portfolio Balance',data:db,borderColor:'#5b9cf6',backgroundColor:'rgba(91,156,246,0.07)',fill:true}
+  ]);
+}
+
+// ── LOAD CHART.JS ────────────────────────────────────────────────
+(function(){
+  var s=document.createElement('script');
+  s.src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
+  s.onload=function(){if(_('pg-results').classList.contains('on'))renderCharts()};
+  document.head.appendChild(s);
+})();
+
+// ── BOOT ─────────────────────────────────────────────────────────
+initAll();
+calc();
+</script>
+</body>
+</html>
